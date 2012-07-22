@@ -197,7 +197,7 @@ public abstract class Field extends SimpleNode implements Serializable {
     /**
      * getValueType method declaration
      */
-    public abstract Class getValueType();
+    public abstract Class<?> getValueType();
 
     /**
      * createValue method declaration

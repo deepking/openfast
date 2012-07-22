@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import org.openfast.debug.BasicDecodeTrace;
 import org.openfast.debug.BasicEncodeTrace;
 import org.openfast.debug.Trace;
@@ -40,100 +41,131 @@ import org.openfast.util.Cache;
 import org.openfast.util.UnboundedCache;
 
 /**
- * Manages current state of an encoding or decoding process.  Each encoder/decoder should have a separate context
+ * Manages current state of an encoding or decoding process. Each
+ * encoder/decoder should have a separate context
  * and contexts should never be shared.
+ * 
  * @author Jacob Northey
  */
 public class Context implements OpenFastContext {
     private TemplateRegistry templateRegistry = new BasicTemplateRegistry();
     private int lastTemplateId;
-    private final Map dictionaries = new HashMap();
+    private final Map<String, Dictionary> dictionaries = new HashMap<String, Dictionary>();
     private ErrorHandler errorHandler = ErrorHandler.DEFAULT;
     private QName currentApplicationType;
-    private final List listeners = Collections.EMPTY_LIST;
+    private final List<TemplateRegisteredListener> listeners = Collections.emptyList();
     private boolean traceEnabled;
     private Trace encodeTrace;
     private Trace decodeTrace;
-    private final Map caches = new HashMap();
+    private final Map<QName, UnboundedCache> caches = new HashMap<QName, UnboundedCache>();
     private final OpenFastContext parentContext;
     private FastMessageLogger logger = null;
 
     public Context() {
         this(new NullOpenFastContext());
     }
+
     public Context(OpenFastContext context) {
         this.parentContext = context;
         dictionaries.put("global", new GlobalDictionary());
         dictionaries.put("template", new TemplateDictionary());
         dictionaries.put("type", new ApplicationTypeDictionary());
     }
+
+    @Override
     public int getTemplateId(MessageTemplate template) {
         if (!templateRegistry.isRegistered(template)) {
-            errorHandler.error(FastConstants.D9_TEMPLATE_NOT_REGISTERED, "The template " + template + " has not been registered.");
+            errorHandler.error(FastConstants.D9_TEMPLATE_NOT_REGISTERED, "The template " + template
+                    + " has not been registered.");
             return 0;
         }
         return templateRegistry.getId(template);
     }
+
+    @Override
     public MessageTemplate getTemplate(int templateId) {
         if (!templateRegistry.isRegistered(templateId)) {
-            errorHandler.error(FastConstants.D9_TEMPLATE_NOT_REGISTERED, "The template with id " + templateId
+            errorHandler.error(FastConstants.D9_TEMPLATE_NOT_REGISTERED, "The template with id "
+                    + templateId
                     + " has not been registered.");
             return null;
         }
         return templateRegistry.get(templateId);
     }
+
+    @Override
     public void registerTemplate(int templateId, MessageTemplate template) {
         templateRegistry.register(templateId, template);
-        Iterator iter = listeners.iterator();
+        Iterator<TemplateRegisteredListener> iter = listeners.iterator();
         while (iter.hasNext()) {
-            ((TemplateRegisteredListener) iter.next()).templateRegistered(template, templateId);
+            iter.next().templateRegistered(template, templateId);
         }
     }
+
     public int getLastTemplateId() {
         return lastTemplateId;
     }
+
     public void setLastTemplateId(int templateId) {
         lastTemplateId = templateId;
     }
+
     public ScalarValue lookup(String dictionary, Group group, QName key) {
-        if (group.hasTypeReference())
+        if (group.hasTypeReference()) {
             currentApplicationType = group.getTypeReference();
+        }
         return getDictionary(dictionary).lookup(group, key, currentApplicationType);
     }
+
     private Dictionary getDictionary(String dictionary) {
-        if (!dictionaries.containsKey(dictionary))
+        if (!dictionaries.containsKey(dictionary)) {
             dictionaries.put(dictionary, new GlobalDictionary());
-        return (Dictionary) dictionaries.get(dictionary);
+        }
+        return dictionaries.get(dictionary);
     }
+
     public void store(String dictionary, Group group, QName key, ScalarValue valueToEncode) {
-        if (group.hasTypeReference())
+        if (group.hasTypeReference()) {
             currentApplicationType = group.getTypeReference();
+        }
         getDictionary(dictionary).store(group, currentApplicationType, key, valueToEncode);
     }
+
     public void reset() {
-        for (Iterator iter = dictionaries.values().iterator(); iter.hasNext();) {
-            Dictionary dict = (Dictionary) iter.next();
+        for (Iterator<Dictionary> iter = dictionaries.values().iterator(); iter.hasNext();) {
+            Dictionary dict = iter.next();
             dict.reset();
         }
     }
+
+    @Override
     public void setErrorHandler(ErrorHandler errorHandler) {
         this.errorHandler = errorHandler;
     }
+
     public void newMessage(MessageTemplate template) {
-        currentApplicationType = (template.hasTypeReference()) ? template.getTypeReference() : FastConstants.ANY_TYPE;
+        currentApplicationType = (template.hasTypeReference()) ? template.getTypeReference()
+                : FastConstants.ANY_TYPE;
     }
+
     public void setCurrentApplicationType(QName name) {
         currentApplicationType = name;
     }
+
+    @Override
     public TemplateRegistry getTemplateRegistry() {
         return templateRegistry;
     }
+
+    @Override
     public void setTemplateRegistry(TemplateRegistry registry) {
         this.templateRegistry = registry;
     }
+
     public boolean isTraceEnabled() {
         return traceEnabled;
     }
+
     public void startTrace() {
         if (isTraceEnabled()) {
             if (decodeTrace == null) {
@@ -144,33 +176,42 @@ public class Context implements OpenFastContext {
             }
         }
     }
+
     public void setTraceEnabled(boolean enabled) {
         this.traceEnabled = enabled;
     }
+
     public void setEncodeTrace(BasicEncodeTrace encodeTrace) {
         this.encodeTrace = encodeTrace;
     }
+
     public Trace getEncodeTrace() {
         return encodeTrace;
     }
+
     public void setDecodeTrace(Trace decodeTrace) {
         this.decodeTrace = decodeTrace;
     }
+
     public Trace getDecodeTrace() {
         return decodeTrace;
     }
+
     public Cache getCache(QName key) {
         if (!caches.containsKey(key)) {
             caches.put(key, new UnboundedCache());
         }
-        return (Cache) caches.get(key);
+        return caches.get(key);
     }
+
     public void store(QName key, int index, ScalarValue value) {
         if (!caches.containsKey(key)) {
             caches.put(key, new UnboundedCache());
         }
         ((Cache)caches.get(key)).store(index, value);
     }
+
+    @Override
     public FastMessageLogger getLogger() {
         if (logger == null) {
             return parentContext.getLogger();
@@ -178,6 +219,7 @@ public class Context implements OpenFastContext {
         return logger;
     }
 
+    @Override
     public void setLogger(FastMessageLogger logger) {
         this.logger = logger;
     }

@@ -43,6 +43,7 @@ final class DecimalType extends SimpleType {
      *            Determines if the Field is required or not for the data
      * @return Returns the codec if the field is required
      */
+    @Override
     public TypeCodec getCodec(Operator operator, boolean optional) {
         return super.getCodec(operator, optional);
     }
@@ -51,11 +52,13 @@ final class DecimalType extends SimpleType {
      * @param value
      * @return
      */
+    @Override
     protected ScalarValue getVal(String value) {
         try {
             return new DecimalValue(Double.parseDouble(value));
         } catch (NumberFormatException e) {
-            Global.handleError(FastConstants.S3_INITIAL_VALUE_INCOMP, "The value \"" + value + "\" is not compatible with type "
+            Global.handleError(FastConstants.S3_INITIAL_VALUE_INCOMP, "The value \"" + value
+                    + "\" is not compatible with type "
                     + this);
             return null;
         }
@@ -64,6 +67,7 @@ final class DecimalType extends SimpleType {
     /**
      * @return Returns a new DecimalValue with a defualt value
      */
+    @Override
     public ScalarValue getDefaultValue() {
         return new DecimalValue(0.0);
     }
@@ -78,6 +82,7 @@ final class DecimalType extends SimpleType {
      * @return Returns true if the previousValue is an instance of DecimalValue,
      *         false otherwise
      */
+    @Override
     public boolean isValueOf(ScalarValue previousValue) {
         return previousValue instanceof DecimalValue;
     }

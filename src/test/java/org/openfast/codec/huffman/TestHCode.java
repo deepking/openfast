@@ -7,6 +7,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.openfast.util.BitInputStream;
+import org.openfast.util.BitOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

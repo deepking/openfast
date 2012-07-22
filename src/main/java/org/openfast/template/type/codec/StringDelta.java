@@ -20,15 +20,17 @@ Contributor(s): Jacob Northey <jacob@lasalletech.com>
  */
 package org.openfast.template.type.codec;
 
+import java.io.InputStream;
+
 import org.openfast.ScalarValue;
 import org.openfast.StringValue;
 import org.openfast.template.TwinValue;
-import java.io.InputStream;
 
 public class StringDelta extends TypeCodec {
     private static final long serialVersionUID = 1L;
 
-    public StringDelta() {}
+    public StringDelta() {
+    }
 
     /**
      * Reads in a stream of data and stores it to a TwinValue object
@@ -37,6 +39,7 @@ public class StringDelta extends TypeCodec {
      *            The InputStream to be decoded
      * @return Returns a TwinValue object with the data stream
      */
+    @Override
     public ScalarValue decode(InputStream in) {
         ScalarValue subtractionLength = TypeCodec.INTEGER.decode(in);
         ScalarValue difference = TypeCodec.ASCII.decode(in);
@@ -50,11 +53,12 @@ public class StringDelta extends TypeCodec {
      *            The ScalarValue to be encoded
      * @return Returns a byte array of the passed object
      */
+    @Override
     public byte[] encodeValue(ScalarValue value) {
         if ((value == null) || (value == ScalarValue.NULL)) {
             throw new IllegalStateException("Cannot have null values for non-nullable string delta");
         }
-        TwinValue diff = (TwinValue) value;
+        TwinValue diff = (TwinValue)value;
         byte[] subtractionLength = TypeCodec.INTEGER.encode(diff.first);
         byte[] difference = TypeCodec.ASCII.encode(diff.second);
         byte[] encoded = new byte[subtractionLength.length + difference.length];
@@ -83,6 +87,7 @@ public class StringDelta extends TypeCodec {
         return new StringValue(value);
     }
 
+    @Override
     public boolean equals(Object obj) {
         return obj != null && obj.getClass() == getClass();
     }

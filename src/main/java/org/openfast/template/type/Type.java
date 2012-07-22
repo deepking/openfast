@@ -22,17 +22,19 @@ package org.openfast.template.type;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.util.LinkedHashMap;
 import java.util.Map;
+
 import org.openfast.ScalarValue;
 import org.openfast.StringValue;
 import org.openfast.template.operator.Operator;
 import org.openfast.template.type.codec.TypeCodec;
 import org.openfast.util.Util;
 
+import com.google.common.collect.Maps;
+
 public abstract class Type implements Serializable {
     private static final long serialVersionUID = 1L;
-    private final static Map TYPE_NAME_MAP = new LinkedHashMap();
+    private final static Map<String, Type> TYPE_NAME_MAP = Maps.newLinkedHashMap();
     private final String name;
 
     public Type(String typeName) {
@@ -126,7 +128,7 @@ public abstract class Type implements Serializable {
             DECIMAL };
     public static final Type[] INTEGER_TYPES = new Type[] { U8, U16, U32, U64, I8, I16, I32, I64 };
 
-    public static Map getRegisteredTypeMap() {
+    public static Map<String, Type> getRegisteredTypeMap() {
         return TYPE_NAME_MAP;
     }
     public boolean equals(Object obj) {

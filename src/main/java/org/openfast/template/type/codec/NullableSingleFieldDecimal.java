@@ -26,6 +26,7 @@ package org.openfast.template.type.codec;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
 import org.openfast.DecimalValue;
 import org.openfast.Global;
 import org.openfast.IntegerValue;
@@ -37,7 +38,8 @@ import org.openfast.template.LongValue;
 final class NullableSingleFieldDecimal extends TypeCodec {
     private static final long serialVersionUID = 1L;
 
-    NullableSingleFieldDecimal() {}
+    NullableSingleFieldDecimal() {
+    }
 
     /**
      * Takes a ScalarValue object, and converts it to a byte array
@@ -46,12 +48,13 @@ final class NullableSingleFieldDecimal extends TypeCodec {
      *            The ScalarValue to be encoded
      * @return Returns a byte array of the passed object
      */
+    @Override
     public byte[] encodeValue(ScalarValue v) {
         if (v == ScalarValue.NULL) {
             return TypeCodec.NULL_VALUE_ENCODING;
         }
         ByteArrayOutputStream buffer = Global.getBuffer();
-        DecimalValue value = (DecimalValue) v;
+        DecimalValue value = (DecimalValue)v;
         try {
             if (Math.abs(value.exponent) > 63) {
                 Global.handleError(FastConstants.R1_LARGE_DECIMAL, "");
@@ -71,13 +74,14 @@ final class NullableSingleFieldDecimal extends TypeCodec {
      *            The InputStream to be decoded
      * @return Returns a decimalValue object with the data stream
      */
+    @Override
     public ScalarValue decode(InputStream in) {
         ScalarValue exp = TypeCodec.NULLABLE_INTEGER.decode(in);
         if ((exp == null) || exp.isNull()) {
             return null;
         }
-        int exponent = ((NumericValue) exp).toInt();
-        long mantissa = ((NumericValue) TypeCodec.INTEGER.decode(in)).toLong();
+        int exponent = ((NumericValue)exp).toInt();
+        long mantissa = ((NumericValue)TypeCodec.INTEGER.decode(in)).toLong();
         DecimalValue decimalValue = new DecimalValue(mantissa, exponent);
         return decimalValue;
     }
@@ -105,10 +109,12 @@ final class NullableSingleFieldDecimal extends TypeCodec {
     /**
      * @return Returns true
      */
+    @Override
     public boolean isNullable() {
         return true;
     }
 
+    @Override
     public boolean equals(Object obj) {
         return obj != null && obj.getClass() == getClass();
     }

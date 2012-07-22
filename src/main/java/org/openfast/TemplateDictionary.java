@@ -17,51 +17,54 @@ are Copyright (C) The LaSalle Technology Group, LLC. All Rights Reserved.
 
 Contributor(s): Jacob Northey <jacob@lasalletech.com>
                 Craig Otis <cotis@lasalletech.com>
-*/
+ */
 package org.openfast;
-
-import org.openfast.template.Group;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.openfast.template.Group;
 
 public class TemplateDictionary implements Dictionary {
-    protected Map table = new HashMap();
+    protected Map<Group, Map<QName, ScalarValue>> table = new HashMap<Group, Map<QName, ScalarValue>>();
 
+    @Override
     public ScalarValue lookup(Group template, QName key, QName applicationType) {
         if (!table.containsKey(template)) {
             return ScalarValue.UNDEFINED;
         }
 
-        if (((Map) table.get(template)).containsKey(key)) {
-            return (ScalarValue) ((Map) table.get(template)).get(key);
+        if ((table.get(template)).containsKey(key)) {
+            return table.get(template).get(key);
         }
 
         return ScalarValue.UNDEFINED;
     }
 
+    @Override
     public void reset() {
         table.clear();
     }
 
+    @Override
     public void store(Group group, QName applicationType, QName key, ScalarValue valueToEncode) {
         if (!table.containsKey(group)) {
-            table.put(group, new HashMap());
+            table.put(group, new HashMap<QName, ScalarValue>());
         }
 
-        ((Map) table.get(group)).put(key, valueToEncode);
+        table.get(group).put(key, valueToEncode);
     }
 
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        Iterator templateIterator = table.keySet().iterator();
+        Iterator<Group> templateIterator = table.keySet().iterator();
         while (templateIterator.hasNext()) {
             Object template = templateIterator.next();
             builder.append("Dictionary: Template=" + template.toString());
-            Map templateMap = (Map)table.get(template);
-            Iterator keyIterator = templateMap.keySet().iterator();
+            Map<QName, ScalarValue> templateMap = table.get(template);
+            Iterator<QName> keyIterator = templateMap.keySet().iterator();
             while (keyIterator.hasNext()) {
                 Object key = keyIterator.next();
                 builder.append(key).append("=").append(templateMap.get(key)).append("\n");

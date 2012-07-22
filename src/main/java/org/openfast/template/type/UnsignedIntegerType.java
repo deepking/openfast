@@ -39,12 +39,15 @@ public class UnsignedIntegerType extends IntegerType {
      *            Determines if the Field is required or not for the data
      * @return Returns the codec if the field is required
      */
+    @Override
     public TypeCodec getCodec(Operator operator, boolean optional) {
-        if (operator.equals(Operator.DELTA))
-            if (optional)
+        if (operator.equals(Operator.DELTA)) {
+            if (optional) {
                 return TypeCodec.NULLABLE_INTEGER;
-            else
+            } else {
                 return TypeCodec.INTEGER;
+            }
+        }
         return super.getCodec(operator, optional);
     }
 }

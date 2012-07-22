@@ -21,6 +21,7 @@ Contributor(s): Jacob Northey <jacob@lasalletech.com>
 package org.openfast.template;
 
 import java.io.InputStream;
+
 import org.openfast.BitVectorReader;
 import org.openfast.Context;
 import org.openfast.FieldValue;
@@ -43,11 +44,12 @@ public class MessageTemplate extends Group implements FieldSet {
     }
 
     private void updateTemplateReference(Field[] fields) {
-        for (int i=0; i<fields.length; i++) {
+        for (int i = 0; i < fields.length; i++) {
             fields[i].setMessageTemplate(this);
         }
     }
 
+    @Override
     public boolean usesPresenceMap() {
         return true;
     }
@@ -66,7 +68,8 @@ public class MessageTemplate extends Group implements FieldSet {
      */
     private static Field[] addTemplateIdField(Field[] fields) {
         Field[] newFields = new Field[fields.length + 1];
-        newFields[0] = new Scalar("templateId", Type.U32, Operator.COPY, ScalarValue.UNDEFINED, false);
+        newFields[0] = new Scalar("templateId", Type.U32, Operator.COPY, ScalarValue.UNDEFINED,
+                false);
         System.arraycopy(fields, 0, newFields, 1, fields.length);
         return newFields;
     }
@@ -76,6 +79,7 @@ public class MessageTemplate extends Group implements FieldSet {
      *            The index to find the field
      * @return Returns the index of the field object
      */
+    @Override
     public Field getField(int index) {
         return fields[index];
     }
@@ -83,6 +87,7 @@ public class MessageTemplate extends Group implements FieldSet {
     /**
      * @return Returns the length of the fields as an int
      */
+    @Override
     public int getFieldCount() {
         return fields.length;
     }
@@ -98,9 +103,11 @@ public class MessageTemplate extends Group implements FieldSet {
      * @return Returns a byte array of the encoded message
      */
     public byte[] encode(Message message, Context context) {
-        if (!context.getTemplateRegistry().isRegistered(message.getTemplate()))
-            throw new FastException("Cannot encode message: The template " + message.getTemplate() + " has not been registered.",
+        if (!context.getTemplateRegistry().isRegistered(message.getTemplate())) {
+            throw new FastException("Cannot encode message: The template " + message.getTemplate()
+                    + " has not been registered.",
                     FastConstants.D9_TEMPLATE_NOT_REGISTERED);
+        }
         message.setInteger(0, context.getTemplateId(message.getTemplate()));
         return super.encode(message, this, context);
     }
@@ -119,15 +126,19 @@ public class MessageTemplate extends Group implements FieldSet {
      *            The previous object to keep the data in sync
      * @return Returns a new message object with the newly decoded fieldValue
      */
-    public Message decode(InputStream in, int templateId, BitVectorReader presenceMapReader, Context context) {
+    public Message decode(InputStream in, int templateId, BitVectorReader presenceMapReader,
+            Context context) {
         try {
-            if (context.isTraceEnabled())
+            if (context.isTraceEnabled()) {
                 context.getDecodeTrace().groupStart(this);
-            FieldValue[] fieldValues = super.decodeFieldValues(in, this, presenceMapReader, context);
+            }
+            FieldValue[] fieldValues = super
+                    .decodeFieldValues(in, this, presenceMapReader, context);
             fieldValues[0] = new IntegerValue(templateId);
             Message message = new Message(this, fieldValues);
-            if (context.isTraceEnabled())
+            if (context.isTraceEnabled()) {
                 context.getDecodeTrace().groupEnd();
+            }
             return message;
         } catch (FastException e) {
             throw new FastException("An error occurred while decoding " + this, e.getCode(), e);
@@ -137,10 +148,12 @@ public class MessageTemplate extends Group implements FieldSet {
     /**
      * @return Returns the class of the message
      */
+    @Override
     public Class getValueType() {
         return Message.class;
     }
 
+    @Override
     public String toString() {
         return name.getName();
     }
@@ -149,6 +162,7 @@ public class MessageTemplate extends Group implements FieldSet {
      * @return Creates a new Message object with the specified FieldValue and
      *         the passed string value
      */
+    @Override
     public FieldValue createValue(String value) {
         return new Message(this);
     }
@@ -156,6 +170,7 @@ public class MessageTemplate extends Group implements FieldSet {
     /**
      * @return Returns the field array
      */
+    @Override
     public Field[] getFields() {
         return fields;
     }
@@ -171,30 +186,38 @@ public class MessageTemplate extends Group implements FieldSet {
         return f;
     }
 
+    @Override
     public boolean equals(Object obj) {
-        if (obj == this)
+        if (obj == this) {
             return true;
-        if (obj == null || !(obj instanceof MessageTemplate))
+        }
+        if (obj == null || !(obj instanceof MessageTemplate)) {
             return false;
-        return equals((MessageTemplate) obj);
+        }
+        return equals((MessageTemplate)obj);
     }
 
     private boolean equals(MessageTemplate other) {
-        if (!name.equals(other.name))
+        if (!name.equals(other.name)) {
             return false;
-        if (fields.length != other.fields.length)
+        }
+        if (fields.length != other.fields.length) {
             return false;
+        }
         for (int i = 0; i < fields.length; i++) {
-            if (!fields[i].equals(other.fields[i]))
+            if (!fields[i].equals(other.fields[i])) {
                 return false;
+            }
         }
         return true;
     }
 
+    @Override
     public int hashCode() {
         int hashCode = (name != null) ? name.hashCode() : 0;
-        for (int i = 0; i < fields.length; i++)
+        for (int i = 0; i < fields.length; i++) {
             hashCode += fields[i].hashCode();
+        }
         return hashCode;
     }
 }

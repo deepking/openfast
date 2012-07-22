@@ -46,9 +46,9 @@ public class GroupValue implements FieldValue {
         this.group = group;
         this.values = values;
 
-        for (int i=0; i<group.getFieldCount(); i++) {
+        for (int i = 0; i < group.getFieldCount(); i++) {
             if (group.getField(i) instanceof Scalar) {
-                Scalar scalar = ((Scalar) group.getField(i));
+                Scalar scalar = ((Scalar)group.getField(i));
                 if (scalar.getOperator().equals(Operator.CONSTANT) && !scalar.isOptional()) {
                     values[i] = scalar.getDefaultValue();
                 }
@@ -60,7 +60,7 @@ public class GroupValue implements FieldValue {
         this(group, new FieldValue[group.getFieldCount()]);
     }
 
-    public Iterator iterator() {
+    public Iterator<Object> iterator() {
         return new ArrayIterator(values);
     }
 
@@ -74,10 +74,12 @@ public class GroupValue implements FieldValue {
             if (group.hasIntrospectiveField(fieldName)) {
                 Scalar scalar = group.getIntrospectiveField(fieldName);
                 if (scalar.getType().equals(Type.UNICODE) || scalar.getType().equals(Type.STRING)
-                        || scalar.getType().equals(Type.ASCII))
+                        || scalar.getType().equals(Type.ASCII)) {
                     return getString(scalar.getName()).length();
-                if (scalar.getType().equals(Type.BYTE_VECTOR))
+                }
+                if (scalar.getType().equals(Type.BYTE_VECTOR)) {
                     return getBytes(scalar.getName()).length;
+                }
             }
 
         }
@@ -85,8 +87,9 @@ public class GroupValue implements FieldValue {
     }
 
     public boolean getBool(String fieldName) {
-        if (!isDefined(fieldName))
+        if (!isDefined(fieldName)) {
             return false;
+        }
         return getScalar(fieldName).toInt() != 0;
     }
 
@@ -148,27 +151,27 @@ public class GroupValue implements FieldValue {
     }
 
     public SequenceValue getSequence(int fieldIndex) {
-        return (SequenceValue) getValue(fieldIndex);
+        return (SequenceValue)getValue(fieldIndex);
     }
 
     public SequenceValue getSequence(String fieldName) {
-        return (SequenceValue) getValue(fieldName);
+        return (SequenceValue)getValue(fieldName);
     }
 
     public ScalarValue getScalar(int fieldIndex) {
-        return (ScalarValue) getValue(fieldIndex);
+        return (ScalarValue)getValue(fieldIndex);
     }
 
     public ScalarValue getScalar(String fieldName) {
-        return (ScalarValue) getValue(fieldName);
+        return (ScalarValue)getValue(fieldName);
     }
 
     public GroupValue getGroup(int fieldIndex) {
-        return (GroupValue) getValue(fieldIndex);
+        return (GroupValue)getValue(fieldIndex);
     }
 
     public GroupValue getGroup(String fieldName) {
-        return (GroupValue) getValue(fieldName);
+        return (GroupValue)getValue(fieldName);
     }
 
     public FieldValue getValue(int fieldIndex) {
@@ -187,8 +190,9 @@ public class GroupValue implements FieldValue {
     }
 
     public void setString(Field field, String value) {
-        if (field == null)
+        if (field == null) {
             throw new IllegalArgumentException("Field must not be null [value=" + value + "]");
+        }
         setFieldValue(field, field.createValue(value));
     }
 
@@ -239,7 +243,7 @@ public class GroupValue implements FieldValue {
     public void setBool(String fieldName, boolean value) {
         setFieldValue(fieldName, new IntegerValue(value ? 1 : 0));
     }
-    
+
     public void setLong(String fieldName, long value) {
         setFieldValue(fieldName, new LongValue(value));
     }
@@ -256,19 +260,18 @@ public class GroupValue implements FieldValue {
         setFieldValue(fieldName, group.getField(fieldName).createValue(value));
     }
 
-
     public void setFieldValue(int fieldIndex, Object value) {
         FieldValue fieldValue = ScalarValue.NULL;
         if (value instanceof String) {
             fieldValue = new StringValue(String.valueOf(value));
         } else if (value instanceof Integer) {
-            fieldValue = new IntegerValue(((Integer) value).intValue());
+            fieldValue = new IntegerValue(((Integer)value).intValue());
         } else if (value instanceof Long) {
-            fieldValue = new LongValue(((Long) value).longValue());
+            fieldValue = new LongValue(((Long)value).longValue());
         } else if (value instanceof Boolean) {
-            fieldValue = new IntegerValue(((Boolean) value).booleanValue() ? 1 : 0);
+            fieldValue = new IntegerValue(((Boolean)value).booleanValue() ? 1 : 0);
         } else if (value instanceof Double) {
-            fieldValue = new DecimalValue(((Double) value).doubleValue());
+            fieldValue = new DecimalValue(((Double)value).doubleValue());
         }
         setFieldValue(fieldIndex, fieldValue);
     }
@@ -283,7 +286,7 @@ public class GroupValue implements FieldValue {
             return false;
         }
 
-        return equals((GroupValue) other);
+        return equals((GroupValue)other);
     }
 
     private boolean equals(GroupValue other) {
@@ -293,8 +296,9 @@ public class GroupValue implements FieldValue {
 
         for (int i = 0; i < values.length; i++) {
             if (values[i] == null) {
-                if (other.values[i] != null)
+                if (other.values[i] != null) {
                     return false;
+                }
             } else if (!values[i].equals(other.values[i])) {
                 return false;
             }
@@ -326,8 +330,10 @@ public class GroupValue implements FieldValue {
     }
 
     public void setFieldValue(String fieldName, FieldValue value) {
-        if (!group.hasField(fieldName))
-            throw new IllegalArgumentException("The field " + fieldName + " does not exist in group " + group);
+        if (!group.hasField(fieldName)) {
+            throw new IllegalArgumentException("The field " + fieldName
+                    + " does not exist in group " + group);
+        }
         int index = group.getFieldIndex(fieldName);
         setFieldValue(index, value);
     }
@@ -348,6 +354,7 @@ public class GroupValue implements FieldValue {
         return getValue(fieldName) != null;
     }
 
+    @Override
     public FieldValue copy() {
         FieldValue[] copies = new FieldValue[values.length];
         for (int i = 0; i < copies.length; i++) {

@@ -1,8 +1,9 @@
-package org.openfast.codec.huffman;
+package org.openfast.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.openfast.codec.huffman.Bits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,15 +13,19 @@ import org.slf4j.LoggerFactory;
 public final class BitOutputStream {
     private static final Logger log = LoggerFactory.getLogger(BitOutputStream.class);
 
-    private OutputStream output; // Underlying byte stream to write to
+    /** Underlying byte stream to write to */
+    private OutputStream        output;
 
-    private int currentByte; // Always in the range 0x00 to 0xFF
+    /** Always in the range 0x00 to 0xFF */
+    private int                 currentByte;
 
-    private int numBitsInCurrentByte; // Always between 0 and 7, inclusive
+    /** Always between 0 and 7, inclusive */
+    private int                 numBitsInCurrentByte;
 
     public BitOutputStream(OutputStream out) {
-        if (out == null)
+        if (out == null) {
             throw new NullPointerException("Argument is null");
+        }
         output = out;
         currentByte = 0;
         numBitsInCurrentByte = 0;
@@ -33,8 +38,9 @@ public final class BitOutputStream {
      * @throws IOException
      */
     public void write(int b) throws IOException {
-        if (!(b == 0 || b == 1))
+        if (!(b == 0 || b == 1)) {
             throw new IllegalArgumentException("Argument must be 0 or 1");
+        }
         currentByte = currentByte << 1 | b;
         numBitsInCurrentByte++;
         if (numBitsInCurrentByte == 8) {
@@ -42,7 +48,7 @@ public final class BitOutputStream {
             numBitsInCurrentByte = 0;
         }
     }
-    
+
     public void write(Bits bist) throws IOException {
         for (Integer bit : bist) {
             currentByte = currentByte << 1 | bit;
@@ -55,8 +61,10 @@ public final class BitOutputStream {
     }
 
     /**
-     * Closes this stream and the underlying OutputStream. If called when this bit stream
-     * is not at a byte boundary, then the minimum number of zeros (between 0 and 7) are
+     * Closes this stream and the underlying OutputStream. If called when this
+     * bit stream
+     * is not at a byte boundary, then the minimum number of zeros (between 0
+     * and 7) are
      * written as padding to reach a byte boundary.
      * 
      * @throws IOException
@@ -65,7 +73,7 @@ public final class BitOutputStream {
         int skipBits = 8 - numBitsInCurrentByte;
 //        while (numBitsInCurrentByte != 0)
 //            write(0);
-        
+
         log.debug("skip bits {}", skipBits);
         output.write(currentByte);
         output.write(skipBits);

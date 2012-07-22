@@ -28,11 +28,11 @@ import org.openfast.template.Group;
 
 public class ApplicationTypeDictionary implements Dictionary {
 
-    private Map dictionary = new HashMap();
+    private Map<QName, Map<QName, ScalarValue>> dictionary = new HashMap<QName, Map<QName,ScalarValue>>();
 
     public ScalarValue lookup(Group template, QName key, QName applicationType) {
         if (dictionary.containsKey(template.getTypeReference())) {
-            Map applicationTypeMap = (Map) dictionary.get(template.getTypeReference());
+            Map<QName, ScalarValue> applicationTypeMap = dictionary.get(template.getTypeReference());
             if (applicationTypeMap.containsKey(key))
                 return (ScalarValue) applicationTypeMap.get(key);
         }
@@ -40,25 +40,25 @@ public class ApplicationTypeDictionary implements Dictionary {
     }
 
     public void reset() {
-        dictionary = new HashMap();
+        dictionary = new HashMap<QName, Map<QName,ScalarValue>>(); //= new HashMap();
     }
 
     public void store(Group group, QName applicationType, QName key, ScalarValue value) {
         if (!dictionary.containsKey(group.getTypeReference())) {
-            dictionary.put(group.getTypeReference(), new HashMap());
+            dictionary.put(group.getTypeReference(), new HashMap<QName, ScalarValue>());
         }
-        Map applicationTypeDictionary = (Map) dictionary.get(group.getTypeReference());
+        Map<QName, ScalarValue> applicationTypeDictionary = dictionary.get(group.getTypeReference());
         applicationTypeDictionary.put(key, value);
     }
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        Iterator templateIterator = dictionary.keySet().iterator();
+        Iterator<QName> templateIterator = dictionary.keySet().iterator();
         while (templateIterator.hasNext()) {
             Object type = templateIterator.next();
             builder.append("Dictionary: Type=" + type.toString());
-            Map templateMap = (Map)dictionary.get(type);
-            Iterator keyIterator = templateMap.keySet().iterator();
+            Map<QName, ScalarValue> templateMap = dictionary.get(type);
+            Iterator<QName> keyIterator = templateMap.keySet().iterator();
             while (keyIterator.hasNext()) {
                 Object key = keyIterator.next();
                 builder.append(key).append("=").append(templateMap.get(key)).append("\n");

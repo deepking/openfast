@@ -24,13 +24,15 @@ Contributor(s): Jacob Northey <jacob@lasalletech.com>
 package org.openfast.template.type.codec;
 
 import java.io.InputStream;
+
 import org.openfast.NumericValue;
 import org.openfast.ScalarValue;
 
 public final class NullableSignedInteger extends IntegerCodec {
     private static final long serialVersionUID = 1L;
 
-    NullableSignedInteger() {}
+    NullableSignedInteger() {
+    }
 
     /**
      * Takes a ScalarValue object, and converts it to a byte array
@@ -39,11 +41,12 @@ public final class NullableSignedInteger extends IntegerCodec {
      *            The ScalarValue to be encoded
      * @return Returns a byte array of the passed object
      */
+    @Override
     public byte[] encodeValue(ScalarValue value) {
         if (value.isNull()) {
             return TypeCodec.NULL_VALUE_ENCODING;
         }
-        NumericValue intValue = (NumericValue) value;
+        NumericValue intValue = (NumericValue)value;
         if (intValue.toLong() >= 0) {
             return TypeCodec.INTEGER.encodeValue(intValue.increment());
         } else {
@@ -59,8 +62,9 @@ public final class NullableSignedInteger extends IntegerCodec {
      *            The InputStream to be decoded
      * @return Returns a new numericValue object
      */
+    @Override
     public ScalarValue decode(InputStream in) {
-        NumericValue numericValue = ((NumericValue) TypeCodec.INTEGER.decode(in));
+        NumericValue numericValue = ((NumericValue)TypeCodec.INTEGER.decode(in));
         long value = numericValue.toLong();
         if (value == 0) {
             return null;
@@ -74,10 +78,12 @@ public final class NullableSignedInteger extends IntegerCodec {
     /**
      * @return Returns true
      */
+    @Override
     public boolean isNullable() {
         return true;
     }
 
+    @Override
     public boolean equals(Object obj) {
         return obj != null && obj.getClass() == getClass();
     }

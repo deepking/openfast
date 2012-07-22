@@ -31,12 +31,13 @@ import org.openfast.Global;
 import org.openfast.IntegerValue;
 import org.openfast.ScalarValue;
 import org.openfast.error.FastConstants;
-import org.openfast.error.FastException;
 
 final class ByteVectorType extends TypeCodec {
     private static final long serialVersionUID = 1L;
 
-    ByteVectorType() {}
+    ByteVectorType() {
+    }
+
     /**
      * Takes a ScalarValue object, and converts it to a byte array
      * 
@@ -44,6 +45,7 @@ final class ByteVectorType extends TypeCodec {
      *            The ScalarValue to be encoded
      * @return Returns a byte array of the passed object
      */
+    @Override
     public byte[] encode(ScalarValue value) {
         byte[] bytes = value.getBytes();
         int lengthSize = IntegerCodec.getUnsignedIntegerSize(bytes.length);
@@ -53,6 +55,7 @@ final class ByteVectorType extends TypeCodec {
         System.arraycopy(bytes, 0, encoding, lengthSize, bytes.length);
         return encoding;
     }
+
     /**
      * Reads in a stream of data and stores it to a ByteVectorValue object
      * 
@@ -61,32 +64,41 @@ final class ByteVectorType extends TypeCodec {
      * @return Returns a new ByteVectorValue object with the data stream as an
      *         array
      */
+    @Override
     public ScalarValue decode(InputStream in) {
-        int length = ((IntegerValue) TypeCodec.UINT.decode(in)).value;
+        int length = ((IntegerValue)TypeCodec.UINT.decode(in)).value;
         byte[] encoding = new byte[length];
-        for (int i = 0; i < length; i++)
+        for (int i = 0; i < length; i++) {
             try {
                 int nextByte = in.read();
                 if (nextByte < 0) {
-                    Global.handleError(FastConstants.END_OF_STREAM, "The end of the input stream has been reached.");
+                    Global.handleError(FastConstants.END_OF_STREAM,
+                            "The end of the input stream has been reached.");
                     return null; // short circuit if global error handler does not throw exception
                 }
-                encoding[i] = (byte) nextByte;
+                encoding[i] = (byte)nextByte;
             } catch (IOException e) {
-                Global.handleError(FastConstants.IO_ERROR, "A IO error has been encountered while decoding.", e);
+                Global.handleError(FastConstants.IO_ERROR,
+                        "A IO error has been encountered while decoding.", e);
                 return null; // short circuit if global error handler does not throw exception
             }
+        }
         return new ByteVectorValue(encoding);
     }
+
+    @Override
     public byte[] encodeValue(ScalarValue value) {
         throw new UnsupportedOperationException();
     }
+
     /**
      * @return Returns a new ByteVectorValue object with the passed value
      */
     public ScalarValue fromString(String value) {
         return new ByteVectorValue(value.getBytes());
     }
+
+    @Override
     public boolean equals(Object obj) {
         return obj != null && obj.getClass() == getClass();
     }

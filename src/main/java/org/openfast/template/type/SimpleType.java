@@ -26,8 +26,8 @@ import org.openfast.template.type.codec.TypeCodec;
 
 public abstract class SimpleType extends Type {
     private static final long serialVersionUID = 1L;
-    private final TypeCodec codec;
-    private final TypeCodec nullableCodec;
+    private final TypeCodec   codec;
+    private final TypeCodec   nullableCodec;
 
     public SimpleType(String typeName, TypeCodec codec, TypeCodec nullableCodec) {
         super(typeName);
@@ -44,9 +44,11 @@ public abstract class SimpleType extends Type {
      *            Determines if the Field is required or not for the data
      * @return Returns the codec if the field is required
      */
+    @Override
     public TypeCodec getCodec(Operator operator, boolean optional) {
-        if (optional)
+        if (optional) {
             return nullableCodec;
+        }
         return codec;
     }
 
@@ -54,9 +56,11 @@ public abstract class SimpleType extends Type {
      * @param value
      * @return wrapper that checks for null so concrete classes don't have to
      */
+    @Override
     public ScalarValue getValue(String value) {
-        if (value == null)
+        if (value == null) {
             return null;
+        }
         return getVal(value);
     }
 

@@ -28,7 +28,8 @@ import org.openfast.util.Util;
 public abstract class IntegerCodec extends TypeCodec {
     private static final long serialVersionUID = 1L;
 
-    protected IntegerCodec() {}
+    protected IntegerCodec() {
+    }
 
     /**
      * Creates a new value, long or integer, depends on value passed to method
@@ -43,7 +44,7 @@ public abstract class IntegerCodec extends TypeCodec {
         if (Util.isBiggerThanInt(value)) {
             return new LongValue(value);
         }
-        return new IntegerValue((int) value);
+        return new IntegerValue((int)value);
     }
 
     /**
@@ -118,6 +119,7 @@ public abstract class IntegerCodec extends TypeCodec {
         return 10;
     }
 
+    @Override
     public boolean equals(Object obj) {
         return obj != null && obj.getClass() == getClass();
     }

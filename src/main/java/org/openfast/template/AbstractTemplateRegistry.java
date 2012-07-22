@@ -26,7 +26,7 @@ import java.util.List;
 import org.openfast.QName;
 
 public abstract class AbstractTemplateRegistry implements TemplateRegistry {
-    private List listeners = Collections.EMPTY_LIST;
+    private List<TemplateRegisteredListener> listeners = Collections.emptyList();
 
     public MessageTemplate get(String name) {
         return get(new QName(name, ""));
@@ -59,7 +59,7 @@ public abstract class AbstractTemplateRegistry implements TemplateRegistry {
 
     public void addTemplateRegisteredListener(TemplateRegisteredListener templateRegisteredListener) {
         if (this.listeners == Collections.EMPTY_LIST)
-            this.listeners = new ArrayList(3);
+            this.listeners = new ArrayList<TemplateRegisteredListener>(3);
         this.listeners.add(templateRegisteredListener);
     }
 

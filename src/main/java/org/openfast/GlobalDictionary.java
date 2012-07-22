@@ -17,40 +17,43 @@ are Copyright (C) The LaSalle Technology Group, LLC. All Rights Reserved.
 
 Contributor(s): Jacob Northey <jacob@lasalletech.com>
                 Craig Otis <cotis@lasalletech.com>
-*/
+ */
 package org.openfast;
-
-import org.openfast.template.Group;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.openfast.template.Group;
 
 public class GlobalDictionary implements Dictionary {
-    protected Map table = new HashMap();
+    protected Map<QName, ScalarValue> table = new HashMap<QName, ScalarValue>();
 
+    @Override
     public ScalarValue lookup(Group template, QName key, QName applicationType) {
         if (!table.containsKey(key)) {
             return ScalarValue.UNDEFINED;
         }
 
-        return (ScalarValue) table.get(key);
+        return table.get(key);
     }
 
+    @Override
     public void store(Group group, QName applicationType, QName key, ScalarValue value) {
         table.put(key, value);
     }
 
+    @Override
     public void reset() {
         table.clear();
     }
-    
+
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        Iterator keyIterator = table.keySet().iterator();
+        Iterator<QName> keyIterator = table.keySet().iterator();
         while (keyIterator.hasNext()) {
-            QName key = (QName) keyIterator.next();
+            QName key = keyIterator.next();
             builder.append("Dictionary: Global");
             builder.append(key).append("=").append(table.get(key)).append("\n");
         }

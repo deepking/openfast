@@ -25,6 +25,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
+
 import org.openfast.DateValue;
 import org.openfast.Global;
 import org.openfast.ScalarValue;
@@ -33,13 +34,14 @@ import org.openfast.error.FastConstants;
 
 public class DateString extends TypeCodec {
     private static final long serialVersionUID = 1L;
-    private final DateFormat formatter;
+    private final DateFormat  formatter;
 
     public DateString(String format) {
         formatter = new SimpleDateFormat(format);
         formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
+    @Override
     public ScalarValue decode(InputStream in) {
         try {
             return new DateValue(formatter.parse(TypeCodec.ASCII.decode(in).toString()));
@@ -49,10 +51,12 @@ public class DateString extends TypeCodec {
         }
     }
 
+    @Override
     public byte[] encodeValue(ScalarValue value) {
-        return TypeCodec.ASCII.encode(new StringValue(formatter.format(((DateValue) value).value)));
+        return TypeCodec.ASCII.encode(new StringValue(formatter.format(((DateValue)value).value)));
     }
 
+    @Override
     public boolean equals(Object obj) {
         return obj != null && obj.getClass() == getClass();
     }

@@ -26,6 +26,7 @@ package org.openfast.template.type.codec;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
 import org.openfast.DecimalValue;
 import org.openfast.Global;
 import org.openfast.IntegerValue;
@@ -36,7 +37,8 @@ import org.openfast.template.LongValue;
 final class SingleFieldDecimal extends TypeCodec {
     private static final long serialVersionUID = 1L;
 
-    SingleFieldDecimal() {}
+    SingleFieldDecimal() {
+    }
 
     /**
      * Takes a ScalarValue object, and converts it to a byte array
@@ -45,15 +47,17 @@ final class SingleFieldDecimal extends TypeCodec {
      *            The ScalarValue to be encoded
      * @return Returns a byte array of the passed object
      */
+    @Override
     public byte[] encodeValue(ScalarValue v) {
         if (v == ScalarValue.NULL) {
             return TypeCodec.NULL_VALUE_ENCODING;
         }
         ByteArrayOutputStream buffer = Global.getBuffer();
-        DecimalValue value = (DecimalValue) v;
+        DecimalValue value = (DecimalValue)v;
         try {
             if (Math.abs(value.exponent) > 63) {
-                Global.handleError(FastConstants.R1_LARGE_DECIMAL, "Encountered exponent of size " + value.exponent);
+                Global.handleError(FastConstants.R1_LARGE_DECIMAL, "Encountered exponent of size "
+                        + value.exponent);
             }
             buffer.write(TypeCodec.INTEGER.encode(new IntegerValue(value.exponent)));
             buffer.write(TypeCodec.INTEGER.encode(new LongValue(value.mantissa)));
@@ -70,10 +74,12 @@ final class SingleFieldDecimal extends TypeCodec {
      *            The InputStream to be decoded
      * @return Returns a decimalValue object with the data stream
      */
+    @Override
     public ScalarValue decode(InputStream in) {
         int exponent = TypeCodec.INTEGER.decode(in).toInt();
         if (Math.abs(exponent) > 63) {
-            Global.handleError(FastConstants.R1_LARGE_DECIMAL, "Encountered exponent of size " + exponent);
+            Global.handleError(FastConstants.R1_LARGE_DECIMAL, "Encountered exponent of size "
+                    + exponent);
         }
         long mantissa = TypeCodec.INTEGER.decode(in).toLong();
         DecimalValue decimalValue = new DecimalValue(mantissa, exponent);
@@ -100,6 +106,7 @@ final class SingleFieldDecimal extends TypeCodec {
         return new DecimalValue(0.0);
     }
 
+    @Override
     public boolean equals(Object obj) {
         return obj != null && obj.getClass() == getClass();
     }

@@ -22,7 +22,7 @@ package org.openfast.util;
 
 import java.util.Iterator;
 
-public class ArrayIterator implements Iterator {
+public class ArrayIterator implements Iterator<Object> {
     private int position;
     private final Object[] array;
 

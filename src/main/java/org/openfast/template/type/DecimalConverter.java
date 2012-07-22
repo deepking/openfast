@@ -28,24 +28,31 @@ import org.openfast.template.ComposedValueConverter;
 import org.openfast.template.LongValue;
 
 public class DecimalConverter implements ComposedValueConverter {
-    private static final long serialVersionUID = 1L;
-    private static final FieldValue[] NULL_SET = new FieldValue[] { null, null };
-    private static final FieldValue[] UNDEFINED_SET = new FieldValue[] { ScalarValue.UNDEFINED, ScalarValue.UNDEFINED };
+    private static final long         serialVersionUID = 1L;
+    private static final FieldValue[] NULL_SET         = new FieldValue[] { null, null };
+    private static final FieldValue[] UNDEFINED_SET    = new FieldValue[] { ScalarValue.UNDEFINED,
+            ScalarValue.UNDEFINED                     };
 
+    @Override
     public FieldValue[] split(FieldValue value) {
-        if (value == null)
+        if (value == null) {
             return NULL_SET;
-        else if (value == ScalarValue.UNDEFINED)
+        } else if (value == ScalarValue.UNDEFINED) {
             return UNDEFINED_SET;
-        DecimalValue decimal = (DecimalValue) value;
-        return new FieldValue[] { new IntegerValue(decimal.exponent), new LongValue(decimal.mantissa) };
+        }
+        DecimalValue decimal = (DecimalValue)value;
+        return new FieldValue[] { new IntegerValue(decimal.exponent),
+                new LongValue(decimal.mantissa) };
     }
 
+    @Override
     public FieldValue compose(FieldValue[] values) {
-        if (values[0] == null)
+        if (values[0] == null) {
             return null;
-        if (values[0] == ScalarValue.UNDEFINED)
+        }
+        if (values[0] == ScalarValue.UNDEFINED) {
             return ScalarValue.UNDEFINED;
-        return new DecimalValue(((ScalarValue) values[1]).toLong(), ((ScalarValue) values[0]).toInt());
+        }
+        return new DecimalValue(((ScalarValue)values[1]).toLong(), ((ScalarValue)values[0]).toInt());
     }
 }

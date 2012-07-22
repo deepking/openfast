@@ -57,7 +57,7 @@ public interface TemplateRegistry {
      * 
      * @return an iterator over the qualified names each item is of type QName
      */
-    Iterator/* <QName> */nameIterator();
+    Iterator<QName> nameIterator();
     /**
      * Iterator over the set of templates (defined or registered) in this
      * registry
@@ -65,5 +65,5 @@ public interface TemplateRegistry {
      * @return an iterator over the set of templates each item is an instance of
      *         MessageTemplate
      */
-    Iterator/* <MessageTemplate> */iterator();
+    Iterator<MessageTemplate> iterator();
 }

@@ -7,39 +7,45 @@ import java.util.List;
 import java.util.Map;
 
 public class SimpleNode implements Node {
-    private List nodes = Collections.EMPTY_LIST;
-    protected Map attributes = Collections.EMPTY_MAP;
+    private List<Node> nodes = Collections.emptyList();
+    protected Map<QName, String> attributes = Collections.emptyMap();
     protected final QName name;
-    
+
     public SimpleNode(QName nodeName) {
         this.name = nodeName;
     }
 
+    @Override
     public void addNode(Node node) {
-        if (nodes.isEmpty())
-            nodes = new ArrayList(3);
+        if (nodes.isEmpty()) {
+            nodes = new ArrayList<Node>(3);
+        }
         nodes.add(node);
     }
 
-    public List getNodes() {
+    @Override
+    public List<Node> getNodes() {
         return nodes;
     }
 
+    @Override
     public String getAttribute(QName name) {
-        return (String) attributes.get(name);
+        return attributes.get(name);
     }
 
-    public Map getAttributes() {
+    @Override
+    public Map<QName, String> getAttributes() {
         return attributes;
     }
 
-    public List getChildren(QName name) {
-        List children = Collections.EMPTY_LIST;
-        for (int i=0; i<nodes.size() && name != null; i++) {
-            Node child = (Node)nodes.get(i);
+    @Override
+    public List<Node> getChildren(QName name) {
+        List<Node> children = Collections.emptyList();
+        for (int i = 0; i < nodes.size() && name != null; i++) {
+            Node child = nodes.get(i);
             if (name.equals(child.getNodeName())) {
                 if (children.isEmpty()) {
-                    children = new ArrayList();
+                    children = new ArrayList<Node>();
                 }
                 children.add(nodes.get(i));
             }
@@ -47,24 +53,28 @@ public class SimpleNode implements Node {
         return children;
     }
 
+    @Override
     public QName getNodeName() {
         return name;
     }
 
+    @Override
     public void setAttribute(QName name, String value) {
         if (attributes.isEmpty()) {
-            attributes = new HashMap();
+            attributes = new HashMap<QName, String>();
         }
         attributes.put(name, value);
     }
 
+    @Override
     public boolean hasAttribute(QName name) {
         return attributes.containsKey(name);
     }
 
+    @Override
     public boolean hasChild(QName name) {
-        for (int i=0; i<nodes.size() && name != null; i++) {
-            Node child = (Node)nodes.get(i);
+        for (int i = 0; i < nodes.size() && name != null; i++) {
+            Node child = nodes.get(i);
             if (name.equals(child.getNodeName())) {
                 return true;
             }

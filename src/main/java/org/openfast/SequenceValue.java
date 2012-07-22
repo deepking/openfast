@@ -20,15 +20,16 @@ Contributor(s): Jacob Northey <jacob@lasalletech.com>
  */
 package org.openfast;
 
-import org.openfast.template.Sequence;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.openfast.template.Sequence;
+
 public class SequenceValue implements FieldValue {
     private static final long serialVersionUID = 1L;
-    private List elements = Collections.EMPTY_LIST;
+    private List<GroupValue> elements = Collections.emptyList();
     private Sequence sequence;
 
     public SequenceValue(Sequence sequence) {
@@ -42,24 +43,25 @@ public class SequenceValue implements FieldValue {
         return elements.size();
     }
 
-    public Iterator iterator() {
+    public Iterator<GroupValue> iterator() {
         return elements.iterator();
     }
 
     public void add(GroupValue value) {
         if (elements == Collections.EMPTY_LIST) {
-            elements = new ArrayList();
+            elements = new ArrayList<GroupValue>();
         }
         elements.add(value);
     }
 
     public void add(FieldValue[] values) {
         if (elements == Collections.EMPTY_LIST) {
-            elements = new ArrayList();
+            elements = new ArrayList<GroupValue>();
         }
         elements.add(new GroupValue(sequence.getGroup(), values));
     }
 
+    @Override
     public boolean equals(Object other) {
         if (other == this) {
             return true;
@@ -67,7 +69,7 @@ public class SequenceValue implements FieldValue {
         if ((other == null) || !(other instanceof SequenceValue)) {
             return false;
         }
-        return equals((SequenceValue) other);
+        return equals((SequenceValue)other);
     }
 
     private boolean equals(SequenceValue other) {
@@ -82,16 +84,18 @@ public class SequenceValue implements FieldValue {
         return true;
     }
 
+    @Override
     public int hashCode() {
         return elements.hashCode() * 37 + sequence.hashCode();
     }
 
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        Iterator iter = elements.iterator();
+        Iterator<GroupValue> iter = elements.iterator();
         builder.append("[ ");
         while (iter.hasNext()) {
-            GroupValue value = (GroupValue) iter.next();
+            GroupValue value = (GroupValue)iter.next();
             builder.append('[').append(value).append("] ");
         }
         builder.append("]");
@@ -99,7 +103,7 @@ public class SequenceValue implements FieldValue {
     }
 
     public GroupValue get(int index) {
-        return (GroupValue) elements.get(index);
+        return (GroupValue)elements.get(index);
     }
 
     public Sequence getSequence() {
@@ -107,13 +111,14 @@ public class SequenceValue implements FieldValue {
     }
 
     public GroupValue[] getValues() {
-        return (GroupValue[]) this.elements.toArray(new GroupValue[elements.size()]);
+        return (GroupValue[])this.elements.toArray(new GroupValue[elements.size()]);
     }
 
+    @Override
     public FieldValue copy() {
         SequenceValue value = new SequenceValue(this.sequence);
         for (int i = 0; i < elements.size(); i++) {
-            value.add((GroupValue) ((GroupValue) elements.get(i)).copy());
+            value.add((GroupValue)((GroupValue)elements.get(i)).copy());
         }
         return value;
     }

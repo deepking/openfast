@@ -33,7 +33,8 @@ import org.openfast.error.FastConstants;
 public final class UnsignedInteger extends IntegerCodec {
     private static final long serialVersionUID = 1L;
 
-    UnsignedInteger() {}
+    UnsignedInteger() {
+    }
 
     /**
      * Takes a ScalarValue object, and converts it to a byte array
@@ -42,12 +43,13 @@ public final class UnsignedInteger extends IntegerCodec {
      *            The value to be encoded
      * @return Returns a byte array of the passed object
      */
+    @Override
     public byte[] encodeValue(ScalarValue scalarValue) {
         long value = scalarValue.toLong();
         int size = getUnsignedIntegerSize(value);
         byte[] encoded = new byte[size];
         for (int factor = 0; factor < size; factor++) {
-            encoded[size - factor - 1] = (byte) ((value >> (factor * 7)) & 0x7f);
+            encoded[size - factor - 1] = (byte)((value >> (factor * 7)) & 0x7f);
         }
         return encoded;
     }
@@ -58,6 +60,7 @@ public final class UnsignedInteger extends IntegerCodec {
      *            The InputStream to be decoded
      * @return the decoded value from the fast input stream
      */
+    @Override
     public ScalarValue decode(InputStream in) {
         long value = 0;
         int byt;
@@ -65,18 +68,21 @@ public final class UnsignedInteger extends IntegerCodec {
             do {
                 byt = in.read();
                 if (byt < 0) {
-                    Global.handleError(FastConstants.END_OF_STREAM, "The end of the input stream has been reached.");
+                    Global.handleError(FastConstants.END_OF_STREAM,
+                            "The end of the input stream has been reached.");
                     return null; // short circuit if global error handler does not throw exception
                 }
                 value = (value << 7) | (byt & 0x7f);
             } while ((byt & 0x80) == 0);
         } catch (IOException e) {
-            Global.handleError(FastConstants.IO_ERROR, "A IO error has been encountered while decoding.", e);
+            Global.handleError(FastConstants.IO_ERROR,
+                    "A IO error has been encountered while decoding.", e);
             return null; // short circuit if global error handler does not throw exception
         }
         return createValue(value);
     }
 
+    @Override
     public boolean equals(Object obj) {
         return obj != null && getClass() == obj.getClass();
     }

@@ -34,7 +34,8 @@ import org.openfast.error.FastConstants;
 public final class SignedInteger extends IntegerCodec {
     private static final long serialVersionUID = 1L;
 
-    SignedInteger() {}
+    SignedInteger() {
+    }
 
     /**
      * Takes a ScalarValue object, and converts it to a byte array
@@ -43,13 +44,14 @@ public final class SignedInteger extends IntegerCodec {
      *            The ScalarValue to be encoded
      * @return Returns a byte array of the passed object
      */
+    @Override
     public byte[] encodeValue(ScalarValue value) {
-        long longValue = ((NumericValue) value).toLong();
+        long longValue = ((NumericValue)value).toLong();
         int size = getSignedIntegerSize(longValue);
         byte[] encoding = new byte[size];
         for (int factor = 0; factor < size; factor++) {
             int bitMask = (factor == (size - 1)) ? 0x3f : 0x7f;
-            encoding[size - factor - 1] = (byte) ((longValue >> (factor * 7)) & bitMask);
+            encoding[size - factor - 1] = (byte)((longValue >> (factor * 7)) & bitMask);
         }
         // Get the sign bit from the long value and set it on the first byte
         // 01000000 00000000 ... 00000000
@@ -64,12 +66,14 @@ public final class SignedInteger extends IntegerCodec {
      *            The InputStream to be decoded
      * @return the decoded value from the fast input stream
      */
+    @Override
     public ScalarValue decode(InputStream in) {
         long value = 0;
         try {
             int byt = in.read();
             if (byt < 0) {
-                Global.handleError(FastConstants.END_OF_STREAM, "The end of the input stream has been reached.");
+                Global.handleError(FastConstants.END_OF_STREAM,
+                        "The end of the input stream has been reached.");
                 return null; // short circuit if global error handler does not throw exception
             }
             if ((byt & 0x40) > 0) {
@@ -79,18 +83,21 @@ public final class SignedInteger extends IntegerCodec {
             while ((byt & 0x80) == 0) {
                 byt = in.read();
                 if (byt < 0) {
-                    Global.handleError(FastConstants.END_OF_STREAM, "The end of the input stream has been reached.");
+                    Global.handleError(FastConstants.END_OF_STREAM,
+                            "The end of the input stream has been reached.");
                     return null; // short circuit if global error handler does not throw exception
                 }
                 value = (value << 7) | (byt & 0x7f);
             }
         } catch (IOException e) {
-            Global.handleError(FastConstants.IO_ERROR, "A IO error has been encountered while decoding.", e);
+            Global.handleError(FastConstants.IO_ERROR,
+                    "A IO error has been encountered while decoding.", e);
             return null; // short circuit if global error handler does not throw exception
         }
         return createValue(value);
     }
 
+    @Override
     public boolean equals(Object obj) {
         return obj != null && obj.getClass() == getClass();
     }

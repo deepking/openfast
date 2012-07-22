@@ -37,8 +37,8 @@ public class MessageOutputStream implements MessageStream {
     private final OutputStream out;
     private final FastEncoder encoder;
     private final Context context;
-    private List handlers = Collections.EMPTY_LIST;
-    private Map templateHandlers = Collections.EMPTY_MAP;
+    private List<MessageHandler> handlers = Collections.emptyList();
+    private Map<MessageTemplate, MessageHandler> templateHandlers = Collections.emptyMap();
     private MessageBlockWriter blockWriter = MessageBlockWriter.NULL;
 
     public MessageOutputStream(OutputStream outputStream) {
@@ -107,14 +107,14 @@ public class MessageOutputStream implements MessageStream {
 
     public void addMessageHandler(MessageTemplate template, MessageHandler handler) {
         if (templateHandlers == Collections.EMPTY_MAP) {
-            templateHandlers = new HashMap();
+            templateHandlers = new HashMap<MessageTemplate, MessageHandler>();
         }
         templateHandlers.put(template, handler);
     }
 
     public void addMessageHandler(MessageHandler handler) {
         if (handlers == Collections.EMPTY_LIST) {
-            handlers = new ArrayList(4);
+            handlers = new ArrayList<MessageHandler>(4);
         }
         handlers.add(handler);
     }

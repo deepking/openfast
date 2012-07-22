@@ -20,15 +20,17 @@ Contributor(s): Jacob Northey <jacob@lasalletech.com>
  */
 package org.openfast.template.type.codec;
 
+import java.io.InputStream;
+
 import org.openfast.ScalarValue;
 import org.openfast.StringValue;
 import org.openfast.template.TwinValue;
-import java.io.InputStream;
 
 public class NullableStringDelta extends TypeCodec {
     private static final long serialVersionUID = 1L;
 
-    public NullableStringDelta() {}
+    public NullableStringDelta() {
+    }
 
     /**
      * Reads in a stream of data and stores it to a TwinValue object
@@ -37,10 +39,12 @@ public class NullableStringDelta extends TypeCodec {
      *            The InputStream to be decoded
      * @return Returns a new TwinValue object with the data as its parameters
      */
+    @Override
     public ScalarValue decode(InputStream in) {
         ScalarValue subtractionLength = TypeCodec.NULLABLE_INTEGER.decode(in);
-        if (subtractionLength == null)
+        if (subtractionLength == null) {
             return null;
+        }
         ScalarValue difference = TypeCodec.ASCII.decode(in);
         return new TwinValue(subtractionLength, difference);
     }
@@ -52,10 +56,12 @@ public class NullableStringDelta extends TypeCodec {
      *            The ScalarValue to be encoded
      * @return Returns a byte array of the passed object
      */
+    @Override
     public byte[] encodeValue(ScalarValue value) {
-        if (value.isNull())
+        if (value.isNull()) {
             return TypeCodec.NULL_VALUE_ENCODING;
-        TwinValue diff = (TwinValue) value;
+        }
+        TwinValue diff = (TwinValue)value;
         byte[] subtractionLength = TypeCodec.NULLABLE_INTEGER.encode(diff.first);
         byte[] difference = TypeCodec.ASCII.encode(diff.second);
         byte[] encoded = new byte[subtractionLength.length + difference.length];
@@ -85,10 +91,12 @@ public class NullableStringDelta extends TypeCodec {
     /**
      * @return Returns true
      */
+    @Override
     public boolean isNullable() {
         return true;
     }
 
+    @Override
     public boolean equals(Object obj) {
         return obj != null && obj.getClass() == getClass();
     }

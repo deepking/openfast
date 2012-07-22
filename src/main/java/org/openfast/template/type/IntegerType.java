@@ -30,39 +30,46 @@ import org.openfast.util.Util;
 
 public abstract class IntegerType extends SimpleType {
     private static final long serialVersionUID = 1L;
-    protected final long minValue;
-    protected final long maxValue;
+    protected final long      minValue;
+    protected final long      maxValue;
 
-    public IntegerType(String typeName, long minValue, long maxValue, TypeCodec codec, TypeCodec nullableCodec) {
+    public IntegerType(String typeName, long minValue, long maxValue, TypeCodec codec,
+            TypeCodec nullableCodec) {
         super(typeName, codec, nullableCodec);
         this.minValue = minValue;
         this.maxValue = maxValue;
     }
+
     /**
      * @param value
      * @return either longvalue or integervalue depending on size of parsed
      *         number
      */
+    @Override
     protected ScalarValue getVal(String value) {
         long longValue;
         try {
             longValue = Long.parseLong(value);
         } catch (NumberFormatException e) {
-            Global.handleError(FastConstants.S3_INITIAL_VALUE_INCOMP, "The value \"" + value + "\" is not compatable with type "
+            Global.handleError(FastConstants.S3_INITIAL_VALUE_INCOMP, "The value \"" + value
+                    + "\" is not compatable with type "
                     + this);
             return null;
         }
         if (Util.isBiggerThanInt(longValue)) {
             return new LongValue(longValue);
         }
-        return new IntegerValue((int) longValue);
+        return new IntegerValue((int)longValue);
     }
+
     /**
      * @return Returns a default value
      */
+    @Override
     public ScalarValue getDefaultValue() {
         return new IntegerValue(0);
     }
+
     /**
      * @param previousValue
      *            The previous value of the Field, used in determining the
@@ -71,9 +78,11 @@ public abstract class IntegerType extends SimpleType {
      * @return Returns true if the passed value is an instance of an integer or
      *         long
      */
+    @Override
     public boolean isValueOf(ScalarValue previousValue) {
         return previousValue instanceof IntegerValue || previousValue instanceof LongValue;
     }
+
     /**
      * Validates the passed ScalarValue, if fails, throws error.
      * 
@@ -81,11 +90,14 @@ public abstract class IntegerType extends SimpleType {
      *            The ScalarValue object to be validated
      * 
      */
+    @Override
     public void validateValue(ScalarValue value) {
-        if (value == null || value.isUndefined())
+        if (value == null || value.isUndefined()) {
             return;
+        }
         if (value.toLong() > maxValue || value.toLong() < minValue) {
-            Global.handleError(FastConstants.D2_INT_OUT_OF_RANGE, "The value " + value + " is out of range for type " + this);
+            Global.handleError(FastConstants.D2_INT_OUT_OF_RANGE, "The value " + value
+                    + " is out of range for type " + this);
         }
     }
 }

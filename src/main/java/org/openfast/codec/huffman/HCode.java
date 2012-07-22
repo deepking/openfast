@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 
+import org.openfast.util.BitInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,30 +16,30 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class HCode {
-    private final Logger log = LoggerFactory.getLogger(HCode.class);
+    private final Logger    log         = LoggerFactory.getLogger(HCode.class);
 
     /** the current tree height */
-    private int esc;
+    private int             esc;
 
     /** the size of the alphabet */
-    private final int size;
+    private final int       size;
 
-    private final int[] pwt = new int[256];
-    private final int[] pnd = new int[256];
+    private final int[]     pwt         = new int[256];
+    private final int[]     pnd         = new int[256];
 
     // condition
     //
     public final static int NOT_IN_COND = 777;
     /** map symbol to a increasing size */
-    private final int[] ptv = new int[256];
+    private final int[]     ptv         = new int[256];
     /** map size to symbol */
-    private final int[] pts = new int[256];
+    private final int[]     pts         = new int[256];
 
     // XXX
-    private int empty1;
-    private int empty2;
+    private int             empty1;
+    private int             empty2;
 
-    private final HNode[] table;
+    private final HNode[]   table;
 
     public HCode(String condPath) throws IOException
     {
@@ -59,22 +60,22 @@ public class HCode {
             cond = new FileInputStream(condPath);
             while (cond.available() > 0) {
                 int symbol = cond.read();
-                if (symbol == -1)
+                if (symbol == -1) {
                     break;
+                }
                 if (ptv[symbol] == NOT_IN_COND) {
                     ptv[symbol] = size;
                     pts[size] = symbol;
                     size++;
                 }
             }
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             log.error("pre-condition({}) building error", condPath, e);
             throw e;
-        }
-        finally {
-            if (cond != null)
+        } finally {
+            if (cond != null) {
                 cond.close();
+            }
         }
 
         if (size > 256 || size < 3) {
@@ -109,21 +110,21 @@ public class HCode {
             cond = new FileInputStream(condPath);
             while (cond.available() > 0) {
                 int symbol = cond.read();
-                if (symbol == -1)
+                if (symbol == -1) {
                     break;
+                }
 
                 symbol = ptv[symbol];
                 Bits bits = encode(symbol);
                 log.trace(bits.toString());
             }
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             log.error("{} not found, current path {}", condPath,
                     System.getProperty("user.dir"));
-        }
-        finally {
-            if (cond != null)
+        } finally {
+            if (cond != null) {
                 cond.close();
+            }
         }
     }
 
@@ -140,10 +141,11 @@ public class HCode {
         //    increment the leaf and proceed
         //    directly to its parent.
 
-        if (table[node].next == up)
+        if (table[node].next == up) {
             table[node].weight += 2;
-        else
+        } else {
             up = node;
+        }
 
         //  slide right and go up until reaching the root
 
@@ -155,8 +157,9 @@ public class HCode {
             //  position by sliding right over
             //  any equal weight nodes
 
-            while (table[node].weight == table[next].weight)
+            while (table[node].weight == table[next].weight) {
                 next = slide(node, next);
+            }
 
             //  increase the weight of the node
 
@@ -165,20 +168,23 @@ public class HCode {
             //  internal nodes go up from this
             //  initial group leader position
 
-            if (node > size)
+            if (node > size) {
                 up = table[node].up;
+            }
 
             //  slide incremented node over smaller weights to its right
 
-            while (table[node].weight > table[next].weight)
+            while (table[node].weight > table[next].weight) {
                 next = slide(node, next);
+            }
 
             //  symbol nodes slide over first,
             //  then go up from their
             //  final positions
 
-            if (node < size)
+            if (node < size) {
                 up = table[node].up;
+            }
         }
 
         //  increase the root's weight
@@ -215,10 +221,11 @@ public class HCode {
 
         //  for a new symbol, direct the receiver to the escape node
         //
-        if (table[node].weight > 0)
+        if (table[node].weight > 0) {
             idx = node;
-        else
+        } else {
             idx = esc;
+        }
 
         //  accumulate the code bits by
         //  working up the tree from
@@ -261,8 +268,7 @@ public class HCode {
             try {
                 int symbol = decode(in);
                 out.write(symbol);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 break;
             }
         }
@@ -285,10 +291,11 @@ public class HCode {
         {
             int bit = in.readNoEof();
             log.info("{} ", bit);
-            if (bit == 1)
+            if (bit == 1) {
                 node = table[node].dnr;
-            else
+            } else {
                 node = table[node].dnl;
+            }
         }
 
         //  sent to the escape node???
@@ -304,8 +311,9 @@ public class HCode {
 
         increment(node);
         int symbol = pts[node];
-        if (symbol == NOT_IN_COND)
+        if (symbol == NOT_IN_COND) {
             log.error("symbol {} is not in cond", symbol);
+        }
         return symbol;
     }
 
@@ -344,12 +352,14 @@ public class HCode {
         pnd[empty] = dsx;
         empty1 = empty;
         empty += max + 1 - empty2;
-        if (empty > max)
+        if (empty > max) {
             empty -= max + 1;
+        }
         empty2 = empty1;
         dsx = max + max;
-        for (dsy = 1; (dsx >>= 1) != 0; dsy <<= 1)
+        for (dsy = 1; (dsx >>= 1) != 0; dsy <<= 1) {
             ;
+        }
         dsx = dsy - max - 1;
         dsz = dsy >> 1;
         if (empty < dsx) {
@@ -385,24 +395,29 @@ public class HCode {
 
         max = esc - size;
         node = max;
-        if ((max >>= 1) != 0) /* do one less since may be all needed */
+        if ((max >>= 1) != 0) {
             do {
                 empty |= in.readNoEof() == 1 ? bit : 0;
                 bit <<= 1;
             } while ((max >>= 1) != 0);
+        }
         max = esc - size;
         dsx = max + max;
-        for (dsy = 1; (dsx >>= 1) != 0; dsy <<= 1)
+        for (dsy = 1; (dsx >>= 1) != 0; dsy <<= 1) {
             ;
+        }
         dsx = dsy - max - 1;
         dsz = dsy >> 1;
-        if (empty >= dsx && max != 0) /* get one more bit */
-            if (in.read() == 1)
+        if (empty >= dsx && max != 0) {
+            if (in.read() == 1) {
                 empty += dsz - dsx;
+            }
+        }
         dsz = max;
         empty += empty2;
-        if (empty > max)
+        if (empty > max) {
             empty -= max + 1;
+        }
         empty2 = empty;
         max = pnd[node];
         node = pnd[empty];
@@ -495,21 +510,23 @@ public class HCode {
 
         // find rightmost possible leaf to exchange with
         //
-        if (idx < size)
+        if (idx < size) {
             while (table[next].weight == table[idx].weight) {
                 idx = next;
                 next = table[idx].next;
             }
+        }
 
         // swap the tree positions
         // of node and idx.
 
         up = table[idx].up;
 
-        if ((parity = table[idx].parity) != 0)
+        if ((parity = table[idx].parity) != 0) {
             table[up].dnr = node;
-        else
+        } else {
             table[up].dnl = node;
+        }
 
         table[idx].parity = table[node].parity;
         table[idx].up = table[node].up;
@@ -518,10 +535,11 @@ public class HCode {
 
         up = table[idx].up;
 
-        if (table[idx].parity != 0)
+        if (table[idx].parity != 0) {
             table[up].dnr = idx;
-        else
+        } else {
             table[up].dnl = idx;
+        }
 
         //  exchange the ranking positions
         //  of node and idx.

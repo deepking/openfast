@@ -22,37 +22,38 @@ package org.openfast.template.type.codec;
 
 import java.io.InputStream;
 import java.io.Serializable;
+
 import org.openfast.ScalarValue;
 
 public abstract class TypeCodec implements Serializable {
-    private static final long serialVersionUID = 1L;
-    protected static final byte STOP_BIT = (byte) 0x80;
-    static final byte[] NULL_VALUE_ENCODING = new byte[] { STOP_BIT };
+    private static final long     serialVersionUID          = 1L;
+    protected static final byte   STOP_BIT                  = (byte)0x80;
+    static final byte[]           NULL_VALUE_ENCODING       = new byte[] { STOP_BIT };
     // Codec Definitions
-    public static final TypeCodec UINT = new UnsignedInteger();
-    public static final TypeCodec INTEGER = new SignedInteger();
-    public static final TypeCodec ASCII = new AsciiString();
-    public static final TypeCodec UNICODE = new UnicodeString();
-    public static final TypeCodec BIT_VECTOR = new BitVectorType();
-    public static final TypeCodec BYTE_VECTOR = new ByteVectorType();
-    public static final TypeCodec SF_SCALED_NUMBER = new SingleFieldDecimal();
-    public static final TypeCodec STRING_DELTA = new StringDelta();
+    public static final TypeCodec UINT                      = new UnsignedInteger();
+    public static final TypeCodec INTEGER                   = new SignedInteger();
+    public static final TypeCodec ASCII                     = new AsciiString();
+    public static final TypeCodec UNICODE                   = new UnicodeString();
+    public static final TypeCodec BIT_VECTOR                = new BitVectorType();
+    public static final TypeCodec BYTE_VECTOR               = new ByteVectorType();
+    public static final TypeCodec SF_SCALED_NUMBER          = new SingleFieldDecimal();
+    public static final TypeCodec STRING_DELTA              = new StringDelta();
     public static final TypeCodec NULLABLE_UNSIGNED_INTEGER = new NullableUnsignedInteger();
-    public static final TypeCodec NULLABLE_INTEGER = new NullableSignedInteger();
-    public static final TypeCodec NULLABLE_ASCII = new NullableAsciiString();
-    public static final TypeCodec NULLABLE_UNICODE = new NullableUnicodeString();
+    public static final TypeCodec NULLABLE_INTEGER          = new NullableSignedInteger();
+    public static final TypeCodec NULLABLE_ASCII            = new NullableAsciiString();
+    public static final TypeCodec NULLABLE_UNICODE          = new NullableUnicodeString();
     public static final TypeCodec NULLABLE_BYTE_VECTOR_TYPE = new NullableByteVector();
     public static final TypeCodec NULLABLE_SF_SCALED_NUMBER = new NullableSingleFieldDecimal();
-    public static final TypeCodec NULLABLE_STRING_DELTA = new NullableStringDelta();
+    public static final TypeCodec NULLABLE_STRING_DELTA     = new NullableStringDelta();
     // DATE CODECS
-    public static final TypeCodec DATE_STRING = new DateString("yyyyMMdd");
-    public static final TypeCodec DATE_INTEGER = new DateInteger();
-    public static final TypeCodec TIMESTAMP_STRING = new DateString("yyyyMMddhhmmssSSS");
-    public static final TypeCodec TIMESTAMP_INTEGER = new TimestampInteger();
-    public static final TypeCodec EPOCH_TIMESTAMP = new EpochTimestamp();
-    public static final TypeCodec TIME_STRING = new DateString("hhmmssSSS");
-    public static final TypeCodec TIME_INTEGER = new TimeInteger();
-    public static final TypeCodec TIME_IN_MS = new MillisecondsSinceMidnight();
+    public static final TypeCodec DATE_STRING               = new DateString("yyyyMMdd");
+    public static final TypeCodec DATE_INTEGER              = new DateInteger();
+    public static final TypeCodec TIMESTAMP_STRING          = new DateString("yyyyMMddhhmmssSSS");
+    public static final TypeCodec TIMESTAMP_INTEGER         = new TimestampInteger();
+    public static final TypeCodec EPOCH_TIMESTAMP           = new EpochTimestamp();
+    public static final TypeCodec TIME_STRING               = new DateString("hhmmssSSS");
+    public static final TypeCodec TIME_INTEGER              = new TimeInteger();
+    public static final TypeCodec TIME_IN_MS                = new MillisecondsSinceMidnight();
 
     public abstract byte[] encodeValue(ScalarValue value);
 

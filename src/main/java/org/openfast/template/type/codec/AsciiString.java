@@ -34,11 +34,12 @@ import org.openfast.StringValue;
 import org.openfast.error.FastConstants;
 
 final class AsciiString extends TypeCodec {
-    private static final long serialVersionUID = 1L;
-    private static final String ZERO_TERMINATOR = "\u0000";
-    private static final byte[] ZERO_PREAMBLE = new byte[] { 0, 0 };
+    private static final long   serialVersionUID = 1L;
+    private static final String ZERO_TERMINATOR  = "\u0000";
+    private static final byte[] ZERO_PREAMBLE    = new byte[] { 0, 0 };
 
-    AsciiString() {}
+    AsciiString() {
+    }
 
     /**
      * Takes a ScalarValue object, and converts it to a byte array
@@ -47,6 +48,7 @@ final class AsciiString extends TypeCodec {
      *            The ScalarValue to be encoded
      * @return Returns a byte array of the passed object
      */
+    @Override
     public byte[] encodeValue(ScalarValue value) {
         if ((value == null) || value.isNull()) {
             throw new IllegalStateException("Only nullable strings can represent null values.");
@@ -68,6 +70,7 @@ final class AsciiString extends TypeCodec {
      *            The InputStream to be decoded
      * @return Returns a new StringValue object with the data stream as a String
      */
+    @Override
     public ScalarValue decode(InputStream in) {
         int byt;
         ByteArrayOutputStream buffer = Global.getBuffer();
@@ -75,22 +78,26 @@ final class AsciiString extends TypeCodec {
             do {
                 byt = in.read();
                 if (byt < 0) {
-                    Global.handleError(FastConstants.END_OF_STREAM, "The end of the input stream has been reached.");
+                    Global.handleError(FastConstants.END_OF_STREAM,
+                            "The end of the input stream has been reached.");
                     return null; // short circuit if global error handler does not throw exception
                 }
                 buffer.write(byt);
             } while ((byt & 0x80) == 0);
         } catch (IOException e) {
-            Global.handleError(FastConstants.IO_ERROR, "A IO error has been encountered while decoding.", e);
+            Global.handleError(FastConstants.IO_ERROR,
+                    "A IO error has been encountered while decoding.", e);
             return null; // short circuit if global error handler does not throw exception
         }
         byte[] bytes = buffer.toByteArray();
         bytes[bytes.length - 1] &= 0x7f;
         if (bytes[0] == 0) {
-            if (!ByteUtil.isEmpty(bytes))
+            if (!ByteUtil.isEmpty(bytes)) {
                 Global.handleError(FastConstants.R9_STRING_OVERLONG, null);
-            if (bytes.length > 1 && bytes[1] == 0)
+            }
+            if (bytes.length > 1 && bytes[1] == 0) {
                 return new StringValue("\u0000");
+            }
             return new StringValue("");
         }
         return new StringValue(new String(bytes));
@@ -103,6 +110,7 @@ final class AsciiString extends TypeCodec {
         return new StringValue(value);
     }
 
+    @Override
     public boolean equals(Object obj) {
         return obj != null && obj.getClass() == getClass();
     }
