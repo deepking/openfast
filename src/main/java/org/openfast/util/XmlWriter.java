@@ -12,7 +12,7 @@ public class XmlWriter {
     private String indent = "";
     private boolean open;
     private boolean hasChildren;
-    private Stack elementStack = new Stack();
+    private Stack<String> elementStack = new Stack<String>();
     private boolean processingInstructionsEnabled;
     private boolean started = false;
 

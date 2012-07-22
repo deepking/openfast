@@ -21,6 +21,7 @@ Contributor(s): Jacob Northey <jacob@lasalletech.com>
 package org.openfast.template;
 
 import java.io.InputStream;
+
 import org.openfast.BitVectorBuilder;
 import org.openfast.BitVectorReader;
 import org.openfast.Context;
@@ -40,6 +41,7 @@ public class DynamicTemplateReference extends Field {
     /**
      * @return Returns null
      */
+    @Override
     public FieldValue createValue(String value) {
         return null;
     }
@@ -51,7 +53,9 @@ public class DynamicTemplateReference extends Field {
      * @param present
      * @return the next message in the decoder
      */
-    public FieldValue decode(InputStream in, Group template, Context context, BitVectorReader pmapReader) {
+    @Override
+    public FieldValue decode(InputStream in, Group template, Context context,
+            BitVectorReader pmapReader) {
         return new FastDecoder(context, in).readMessage();
     }
 
@@ -62,14 +66,17 @@ public class DynamicTemplateReference extends Field {
      * @param presenceMapBuilder
      * @return the encoding of the message given its template
      */
-    public byte[] encode(FieldValue value, Group template, Context context, BitVectorBuilder presenceMapBuilder) {
-        Message message = (Message) value;
+    @Override
+    public byte[] encode(FieldValue value, Group template, Context context,
+            BitVectorBuilder presenceMapBuilder) {
+        Message message = (Message)value;
         return message.getTemplate().encode(message, context);
     }
 
     /**
      * @return Returns null
      */
+    @Override
     public String getTypeName() {
         return null;
     }
@@ -77,13 +84,15 @@ public class DynamicTemplateReference extends Field {
     /**
      * @return Returns null
      */
-    public Class getValueType() {
+    @Override
+    public Class<? extends FieldValue> getValueType() {
         return null;
     }
 
     /**
      * @return Returns false
      */
+    @Override
     public boolean isPresenceMapBitSet(byte[] encoding, FieldValue fieldValue) {
         return false;
     }
@@ -91,14 +100,17 @@ public class DynamicTemplateReference extends Field {
     /**
      * @return Returns false
      */
+    @Override
     public boolean usesPresenceMapBit() {
         return false;
     }
 
+    @Override
     public boolean equals(Object obj) {
         return obj != null && obj.getClass().equals(this.getClass());
     }
-    
+
+    @Override
     public String toString() {
         return "DynamicTemplateRef";
     }

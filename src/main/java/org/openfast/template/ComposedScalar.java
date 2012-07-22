@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+
 import org.openfast.BitVectorBuilder;
 import org.openfast.BitVectorReader;
 import org.openfast.Context;
@@ -33,17 +34,19 @@ import org.openfast.template.type.Type;
 
 public class ComposedScalar extends Field {
     private static final long serialVersionUID = 1L;
-    private static final Class ScalarValueType = null;
+    private static final Class<? extends FieldValue> ScalarValueType = null;
     private Scalar[] fields;
     private ComposedValueConverter valueConverter;
     private Type type;
     private FieldValue[] values;
 
-    public ComposedScalar(String name, Type type, Scalar[] fields, boolean optional, ComposedValueConverter valueConverter) {
+    public ComposedScalar(String name, Type type, Scalar[] fields, boolean optional,
+            ComposedValueConverter valueConverter) {
         this(new QName(name), type, fields, optional, valueConverter);
     }
 
-    public ComposedScalar(QName name, Type type, Scalar[] fields, boolean optional, ComposedValueConverter valueConverter) {
+    public ComposedScalar(QName name, Type type, Scalar[] fields, boolean optional,
+            ComposedValueConverter valueConverter) {
         super(name, optional);
         this.fields = fields;
         this.valueConverter = valueConverter;
@@ -51,23 +54,29 @@ public class ComposedScalar extends Field {
         this.values = new FieldValue[fields.length];
     }
 
+    @Override
     public FieldValue createValue(String value) {
         return type.getValue(value);
     }
 
-    public FieldValue decode(InputStream in, Group template, Context context, BitVectorReader presenceMapReader) {
-        synchronized(values) {
+    @Override
+    public FieldValue decode(InputStream in, Group template, Context context,
+            BitVectorReader presenceMapReader) {
+        synchronized (values) {
             Arrays.fill(values, null);
             for (int i = 0; i < fields.length; i++) {
                 values[i] = fields[i].decode(in, template, context, presenceMapReader);
-                if (i == 0 && values[0] == null)
+                if (i == 0 && values[0] == null) {
                     return null;
+                }
             }
             return valueConverter.compose(values);
         }
     }
 
-    public byte[] encode(FieldValue value, Group template, Context context, BitVectorBuilder presenceMapBuilder) {
+    @Override
+    public byte[] encode(FieldValue value, Group template, Context context,
+            BitVectorBuilder presenceMapBuilder) {
         if (value == null) {
             // Only encode null in the first field.
             return fields[0].encode(null, template, context, presenceMapBuilder);
@@ -85,22 +94,27 @@ public class ComposedScalar extends Field {
         }
     }
 
+    @Override
     public String getTypeName() {
         return type.getName();
     }
 
-    public Class getValueType() {
+    @Override
+    public Class<? extends FieldValue> getValueType() {
         return ScalarValueType;
     }
 
+    @Override
     public boolean isPresenceMapBitSet(byte[] encoding, FieldValue fieldValue) {
         return false;
     }
 
+    @Override
     public boolean usesPresenceMapBit() {
-        for (int i=0; i<fields.length; i++) {
-            if (fields[i].usesPresenceMapBit())
+        for (int i = 0; i < fields.length; i++) {
+            if (fields[i].usesPresenceMapBit()) {
                 return true;
+            }
         }
         return false;
     }
@@ -113,42 +127,56 @@ public class ComposedScalar extends Field {
         return fields;
     }
 
+    @Override
     public boolean equals(Object obj) {
-        if (obj == this)
+        if (obj == this) {
             return true;
-        if (obj == null || !obj.getClass().equals(ComposedScalar.class))
+        }
+        if (obj == null || !obj.getClass().equals(ComposedScalar.class)) {
             return false;
-        ComposedScalar other = (ComposedScalar) obj;
-        if (other.fields.length != fields.length)
+        }
+        ComposedScalar other = (ComposedScalar)obj;
+        if (other.fields.length != fields.length) {
             return false;
-        if (!other.getName().equals(getName()))
+        }
+        if (!other.getName().equals(getName())) {
             return false;
+        }
         for (int i = 0; i < fields.length; i++) {
-            if (!other.fields[i].getType().equals(fields[i].getType()))
+            if (!other.fields[i].getType().equals(fields[i].getType())) {
                 return false;
-            if (!other.fields[i].getTypeCodec().equals(fields[i].getTypeCodec()))
+            }
+            if (!other.fields[i].getTypeCodec().equals(fields[i].getTypeCodec())) {
                 return false;
-            if (!other.fields[i].getOperator().equals(fields[i].getOperator()))
+            }
+            if (!other.fields[i].getOperator().equals(fields[i].getOperator())) {
                 return false;
-            if (!other.fields[i].getOperatorCodec().equals(fields[i].getOperatorCodec()))
+            }
+            if (!other.fields[i].getOperatorCodec().equals(fields[i].getOperatorCodec())) {
                 return false;
-            if (!other.fields[i].getDefaultValue().equals(fields[i].getDefaultValue()))
+            }
+            if (!other.fields[i].getDefaultValue().equals(fields[i].getDefaultValue())) {
                 return false;
-            if (!other.fields[i].getDictionary().equals(fields[i].getDictionary()))
+            }
+            if (!other.fields[i].getDictionary().equals(fields[i].getDictionary())) {
                 return false;
+            }
         }
         return true;
     }
 
+    @Override
     public int hashCode() {
         return name.hashCode();
     }
 
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("Composed {");
-        for (int i = 0; i < fields.length; i++)
+        for (int i = 0; i < fields.length; i++) {
             builder.append(fields[i].toString()).append(", ");
+        }
         builder.delete(builder.length() - 2, builder.length());
         return builder.append("}").toString();
     }

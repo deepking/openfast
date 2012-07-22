@@ -23,47 +23,59 @@ package org.openfast.template;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import org.openfast.QName;
 
 public abstract class AbstractTemplateRegistry implements TemplateRegistry {
     private List<TemplateRegisteredListener> listeners = Collections.emptyList();
 
+    @Override
     public MessageTemplate get(String name) {
         return get(new QName(name, ""));
     }
 
+    @Override
     public int getId(String name) {
         return getId(new QName(name, ""));
     }
 
+    @Override
     public boolean isDefined(String name) {
         return isDefined(new QName(name, ""));
     }
 
+    @Override
     public boolean isRegistered(String name) {
         return isRegistered(new QName(name, ""));
     }
 
+    @Override
     public void register(int templateId, String name) {
         register(templateId, new QName(name, ""));
     }
 
+    @Override
     public void remove(String name) {
         remove(new QName(name, ""));
     }
 
     protected void notifyTemplateRegistered(MessageTemplate template, int id) {
-        for (int i = 0; i < listeners.size(); i++)
-            ((TemplateRegisteredListener) listeners.get(i)).templateRegistered(template, id);
+        for (int i = 0; i < listeners.size(); i++) {
+            listeners.get(i).templateRegistered(template, id);
+        }
     }
 
+    @Override
     public void addTemplateRegisteredListener(TemplateRegisteredListener templateRegisteredListener) {
-        if (this.listeners == Collections.EMPTY_LIST)
+        if (this.listeners == Collections.EMPTY_LIST) {
             this.listeners = new ArrayList<TemplateRegisteredListener>(3);
+        }
         this.listeners.add(templateRegisteredListener);
     }
 
-    public void removeTemplateRegisteredListener(TemplateRegisteredListener templateRegisteredListener) {
+    @Override
+    public void removeTemplateRegisteredListener(
+            TemplateRegisteredListener templateRegisteredListener) {
         this.listeners.remove(templateRegisteredListener);
     }
 }

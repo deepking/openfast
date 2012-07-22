@@ -49,12 +49,12 @@ public class XMLMessageTemplateSerializer implements MessageTemplateSerializer {
     }
     
     private String whichNamespaceIsUsedMode(MessageTemplate[] templates) {
-        Map namespaces = new HashMap();
+        Map<String, Integer> namespaces = new HashMap<String, Integer>();
         for (int i=0; i<templates.length; i++) {
             tallyNamespaceReferences(templates[i], namespaces);
         }
         
-        Iterator iter = namespaces.keySet().iterator();
+        Iterator<String> iter = namespaces.keySet().iterator();
         int champion = 0;
         String championNs = "";
         while (iter.hasNext()) {
@@ -67,7 +67,7 @@ public class XMLMessageTemplateSerializer implements MessageTemplateSerializer {
         }
         return championNs;
     }
-    private void tallyNamespaceReferences(Group group, Map namespaces) {
+    private void tallyNamespaceReferences(Group group, Map<String, Integer> namespaces) {
         int start = 0;
         if (group instanceof MessageTemplate)
             start = 1;
@@ -88,7 +88,7 @@ public class XMLMessageTemplateSerializer implements MessageTemplateSerializer {
     }
     
     private String whichTemplateNamespaceIsUsedMost(MessageTemplate[] templates) {
-        Map namespaces = new HashMap();
+        Map<String, Integer> namespaces = new HashMap<String, Integer>();
         for (int i=0; i<templates.length; i++) {
             String ns = templates[i].getQName().getNamespace();
             if (!namespaces.containsKey(ns)) {
@@ -98,7 +98,7 @@ public class XMLMessageTemplateSerializer implements MessageTemplateSerializer {
             }
         }
         
-        Iterator iter = namespaces.keySet().iterator();
+        Iterator<String> iter = namespaces.keySet().iterator();
         int champion = 0;
         String championNs = "";
         while (iter.hasNext()) {

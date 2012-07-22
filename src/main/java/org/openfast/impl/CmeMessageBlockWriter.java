@@ -1,9 +1,8 @@
 package org.openfast.impl;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.DataOutputStream;
+
 import org.openfast.Message;
 import org.openfast.MessageBlockWriter;
 

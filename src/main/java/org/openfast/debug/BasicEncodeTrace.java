@@ -32,7 +32,7 @@ import org.openfast.template.Group;
 
 public class BasicEncodeTrace implements Trace {
 
-    private Stack stack = new Stack();
+    private Stack<TraceGroup> stack = new Stack<TraceGroup>();
     private PrintWriter out = new PrintWriter(System.out);
 
     public void groupStart(Group group) {
@@ -59,7 +59,7 @@ public class BasicEncodeTrace implements Trace {
 
     private class TraceGroup implements TraceNode {
 
-        private List nodes;
+        private List<TraceNode> nodes;
 
         private byte[] pmap;
 
@@ -67,7 +67,7 @@ public class BasicEncodeTrace implements Trace {
 
         public TraceGroup(Group group) {
             this.group = group;
-            this.nodes = new ArrayList(group.getFieldCount());
+            this.nodes = new ArrayList<TraceNode>(group.getFieldCount());
         }
 
         public void setPmap(byte[] pmap) {

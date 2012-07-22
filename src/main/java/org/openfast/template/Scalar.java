@@ -63,10 +63,13 @@ public class Scalar extends Field {
      * @param optional
      *            Determines if the Scalar is required or not for the data
      */
-    public Scalar(String name, Type type, Operator operator, ScalarValue defaultValue, boolean optional) {
+    public Scalar(String name, Type type, Operator operator, ScalarValue defaultValue,
+            boolean optional) {
         this(new QName(name), type, operator, defaultValue, optional);
     }
-    public Scalar(QName name, Type type, Operator operator, ScalarValue defaultValue, boolean optional) {
+
+    public Scalar(QName name, Type type, Operator operator, ScalarValue defaultValue,
+            boolean optional) {
         super(name, optional);
         this.operator = operator;
         this.operatorCodec = operator.getCodec(type);
@@ -74,9 +77,11 @@ public class Scalar extends Field {
         this.defaultValue = (defaultValue == null) ? ScalarValue.UNDEFINED : defaultValue;
         this.type = type;
         this.typeCodec = type.getCodec(operator, optional);
-        this.initialValue = ((defaultValue == null) || defaultValue.isUndefined()) ? this.type.getDefaultValue() : defaultValue;
+        this.initialValue = ((defaultValue == null) || defaultValue.isUndefined()) ? this.type
+                .getDefaultValue() : defaultValue;
         operator.validate(this);
     }
+
     /**
      * Scalar constructor - sets the dictionary as global and validates the
      * entries
@@ -92,7 +97,8 @@ public class Scalar extends Field {
      * @param optional
      *            Determines if the Scalar is required or not for the data
      */
-    public Scalar(QName name, Type type, OperatorCodec operatorCodec, ScalarValue defaultValue, boolean optional) {
+    public Scalar(QName name, Type type, OperatorCodec operatorCodec, ScalarValue defaultValue,
+            boolean optional) {
         super(name, optional);
         this.operator = operatorCodec.getOperator();
         this.operatorCodec = operatorCodec;
@@ -100,9 +106,11 @@ public class Scalar extends Field {
         this.defaultValue = (defaultValue == null) ? ScalarValue.UNDEFINED : defaultValue;
         this.type = type;
         this.typeCodec = type.getCodec(operator, optional);
-        this.initialValue = ((defaultValue == null) || defaultValue.isUndefined()) ? this.type.getDefaultValue() : defaultValue;
+        this.initialValue = ((defaultValue == null) || defaultValue.isUndefined()) ? this.type
+                .getDefaultValue() : defaultValue;
         operator.validate(this);
     }
+
     /**
      * 
      * @return Returns the type as a string
@@ -110,6 +118,7 @@ public class Scalar extends Field {
     public Type getType() {
         return type;
     }
+
     /**
      * 
      * @return Returns the Operator object
@@ -117,6 +126,7 @@ public class Scalar extends Field {
     public OperatorCodec getOperatorCodec() {
         return operatorCodec;
     }
+
     /**
      * 
      * @return Returns the operator name as a string
@@ -124,6 +134,7 @@ public class Scalar extends Field {
     public Operator getOperator() {
         return operator;
     }
+
     /**
      * @param fieldValue
      *            The Field value
@@ -138,24 +149,31 @@ public class Scalar extends Field {
      *             RuntimeException if the encoding fails - will print to
      *             console the name of the scalar to fail
      */
-    public byte[] encode(FieldValue fieldValue, Group template, Context context, BitVectorBuilder presenceMapBuilder) {
-        ScalarValue priorValue = (ScalarValue) context.lookup(getDictionary(), template, getKey());
-        ScalarValue value = (ScalarValue) fieldValue;
-        if (!operatorCodec.canEncode(value, this))
-            Global.handleError(FastConstants.D3_CANT_ENCODE_VALUE, "The scalar " + this + " cannot encode the value " + value);
-        ScalarValue valueToEncode = operatorCodec.getValueToEncode((ScalarValue) value, priorValue, this, presenceMapBuilder);
+    @Override
+    public byte[] encode(FieldValue fieldValue, Group template, Context context,
+            BitVectorBuilder presenceMapBuilder) {
+        ScalarValue priorValue = context.lookup(getDictionary(), template, getKey());
+        ScalarValue value = (ScalarValue)fieldValue;
+        if (!operatorCodec.canEncode(value, this)) {
+            Global.handleError(FastConstants.D3_CANT_ENCODE_VALUE, "The scalar " + this
+                    + " cannot encode the value " + value);
+        }
+        ScalarValue valueToEncode = operatorCodec.getValueToEncode(value, priorValue, this,
+                presenceMapBuilder);
         if (operator.shouldStoreValue(value)) {
-            context.store(getDictionary(), template, getKey(), (ScalarValue) value);
+            context.store(getDictionary(), template, getKey(), value);
         }
         if (valueToEncode == null) {
             return new byte[0];
         }
         byte[] encoding = typeCodec.encode(valueToEncode);
         if (context.isTraceEnabled() && encoding.length > 0) {
-            context.getEncodeTrace().field(this, fieldValue, valueToEncode, encoding, presenceMapBuilder.getIndex());
+            context.getEncodeTrace().field(this, fieldValue, valueToEncode, encoding,
+                    presenceMapBuilder.getIndex());
         }
         return encoding;
     }
+
     /**
      * 
      * @return Returns the dictionary as a string
@@ -163,6 +181,7 @@ public class Scalar extends Field {
     public String getDictionary() {
         return dictionary;
     }
+
     /**
      * 
      * @param newValue
@@ -173,6 +192,7 @@ public class Scalar extends Field {
     public ScalarValue decodeValue(ScalarValue newValue, ScalarValue previousValue) {
         return operatorCodec.decodeValue(newValue, previousValue, this);
     }
+
     /**
      * 
      * @return Returns the defaultValue of the current ScalarValue
@@ -180,6 +200,7 @@ public class Scalar extends Field {
     public ScalarValue getDefaultValue() {
         return defaultValue;
     }
+
     /**
      * 
      * @param previousValue
@@ -189,18 +210,23 @@ public class Scalar extends Field {
     public ScalarValue decode(ScalarValue previousValue) {
         return operatorCodec.decodeEmptyValue(previousValue, this);
     }
+
     /**
      * @return Returns true
      */
+    @Override
     public boolean usesPresenceMapBit() {
         return operatorCodec.usesPresenceMapBit(optional);
     }
+
     /**
      * @return Returns true if the byte array has a length
      */
+    @Override
     public boolean isPresenceMapBitSet(byte[] encoding, FieldValue fieldValue) {
         return operatorCodec.isPresenceMapBitSet(encoding, fieldValue);
     }
+
     /**
      * 
      * @param in
@@ -215,7 +241,9 @@ public class Scalar extends Field {
      *         decodes the previousValue and returns the FieldValue object after
      *         decoding
      */
-    public FieldValue decode(InputStream in, Group template, Context context, BitVectorReader presenceMapReader) {
+    @Override
+    public FieldValue decode(InputStream in, Group template, Context context,
+            BitVectorReader presenceMapReader) {
         try {
             ScalarValue previousValue = null;
             if (operator.usesDictionary()) {
@@ -225,15 +253,18 @@ public class Scalar extends Field {
             ScalarValue value;
             int pmapIndex = presenceMapReader.getIndex();
             if (isPresent(presenceMapReader)) {
-                if (context.isTraceEnabled())
+                if (context.isTraceEnabled()) {
                     in = new RecordingInputStream(in);
+                }
                 if (!operatorCodec.shouldDecodeType()) {
                     return operatorCodec.decodeValue(null, null, this);
                 }
                 ScalarValue decodedValue = typeCodec.decode(in);
                 value = decodeValue(decodedValue, previousValue);
-                if (context.isTraceEnabled())
-                    context.getDecodeTrace().field(this, value, decodedValue, ((RecordingInputStream) in).getBuffer(), pmapIndex);
+                if (context.isTraceEnabled()) {
+                    context.getDecodeTrace().field(this, value, decodedValue,
+                            ((RecordingInputStream)in).getBuffer(), pmapIndex);
+                }
             } else {
                 value = decode(previousValue);
             }
@@ -246,6 +277,7 @@ public class Scalar extends Field {
             throw new FastException("Error occurred while decoding " + this, e.getCode(), e);
         }
     }
+
     /**
      * Validate the passed ScalarValue and the Type objects
      * 
@@ -255,10 +287,12 @@ public class Scalar extends Field {
      *            The type to be validated
      */
     private void validateDecodedValueIsCorrectForType(ScalarValue value, Type type) {
-        if (value == null)
+        if (value == null) {
             return;
+        }
         type.validateValue(value);
     }
+
     /**
      * 
      * @param previousValue
@@ -266,12 +300,15 @@ public class Scalar extends Field {
      *            The type to be validated
      */
     private void validateDictionaryTypeAgainstFieldType(ScalarValue previousValue, Type type) {
-        if (previousValue == null || previousValue.isUndefined())
+        if (previousValue == null || previousValue.isUndefined()) {
             return;
+        }
         if (!type.isValueOf(previousValue)) {
-            Global.handleError(FastConstants.D4_INVALID_TYPE, "The value \"" + previousValue + "\" is not valid for the type " + type);
+            Global.handleError(FastConstants.D4_INVALID_TYPE, "The value \"" + previousValue
+                    + "\" is not valid for the type " + type);
         }
     }
+
     /**
      * Sets the dictionary to the passed string
      * 
@@ -279,36 +316,47 @@ public class Scalar extends Field {
      *            The string to be stored as the dictionary
      */
     public void setDictionary(String dictionary) {
-        if (dictionary == null)
+        if (dictionary == null) {
             throw new NullPointerException();
+        }
         this.dictionary = dictionary;
     }
+
     /**
      * @return Returns the string 'Scalar [name=X, operator=X, dictionary=X]'
      */
+    @Override
     public String toString() {
-        return "Scalar [name=" + name.getName() + ", operator=" + operator + ", type=" + type + ", dictionary=" + dictionary + "]";
+        return "Scalar [name=" + name.getName() + ", operator=" + operator + ", type=" + type
+                + ", dictionary=" + dictionary + "]";
     }
+
     /**
      * @return Returns the class of the current ScalarValue
      */
-    public Class getValueType() {
+    @Override
+    public Class<? extends FieldValue> getValueType() {
         return ScalarValue.class;
     }
+
     /**
      * @param value
      *            Creates a FieldValue of the passed value
      * @return Returns the FieldValue object with the passed value
      */
+    @Override
     public FieldValue createValue(String value) {
         return type.getValue(value);
     }
+
     /**
      * @return Returns the string 'scalar'
      */
+    @Override
     public String getTypeName() {
         return "scalar";
     }
+
     /**
      * 
      * @return Returns the initialValue of the current ScalarValue object
@@ -316,6 +364,7 @@ public class Scalar extends Field {
     public ScalarValue getBaseValue() {
         return initialValue;
     }
+
     /**
      * 
      * @return Returns the type of the Codec
@@ -323,16 +372,22 @@ public class Scalar extends Field {
     public TypeCodec getTypeCodec() {
         return typeCodec;
     }
+
     public String serialize(ScalarValue value) {
         return type.serialize(value);
     }
+
+    @Override
     public boolean equals(Object other) {
-        if (other == this)
+        if (other == this) {
             return true;
-        if (other == null || !(other instanceof Scalar))
+        }
+        if (other == null || !(other instanceof Scalar)) {
             return false;
-        return equals((Scalar) other);
+        }
+        return equals((Scalar)other);
     }
+
     private boolean equals(Scalar other) {
         boolean equals = equals(name, other.name);
         equals = equals && equals(type, other.type);
@@ -344,16 +399,21 @@ public class Scalar extends Field {
         equals = equals && equals(id, other.id);
         return equals;
     }
+
     private boolean equals(Object o, Object o2) {
         if (o == null) {
-            if (o2 == null)
+            if (o2 == null) {
                 return true;
+            }
             return false;
         }
         return o.equals(o2);
     }
+
+    @Override
     public int hashCode() {
-        return name.hashCode() + type.hashCode() + typeCodec.hashCode() + operator.hashCode() + operatorCodec.hashCode()
+        return name.hashCode() + type.hashCode() + typeCodec.hashCode() + operator.hashCode()
+                + operatorCodec.hashCode()
                 + initialValue.hashCode() + dictionary.hashCode();
     }
 }

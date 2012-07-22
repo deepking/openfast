@@ -375,7 +375,7 @@ public class Group extends Field {
      * @return Returns the class of the GroupValue
      */
     @Override
-    public Class<GroupValue> getValueType() {
+    public Class<? extends FieldValue> getValueType() {
         return GroupValue.class;
     }
 

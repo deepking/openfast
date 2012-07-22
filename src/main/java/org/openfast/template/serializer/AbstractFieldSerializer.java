@@ -52,7 +52,7 @@ public abstract class AbstractFieldSerializer implements FieldSerializer {
     }
     
     protected static void writeLength(XmlWriter writer, Node node, SerializingContext context) {
-        List lengthNodes = node.getChildren(FastConstants.LENGTH_FIELD);
+        List<Node> lengthNodes = node.getChildren(FastConstants.LENGTH_FIELD);
         if (!lengthNodes.isEmpty()) {
             Node lengthNode = (Node) lengthNodes.get(0);
             writer.start("length");

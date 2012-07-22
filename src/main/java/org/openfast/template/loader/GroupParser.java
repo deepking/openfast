@@ -67,7 +67,7 @@ public class GroupParser extends AbstractFieldParser {
      */
     protected static Field[] parseFields(Element template, ParsingContext context) {
         NodeList childNodes = template.getChildNodes();
-        List fields = new ArrayList();
+        List<Field> fields = new ArrayList<Field>();
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node item = childNodes.item(i);
             if (isElement(item)) {

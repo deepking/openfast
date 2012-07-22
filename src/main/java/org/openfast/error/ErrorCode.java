@@ -25,7 +25,7 @@ import java.util.Map;
 import org.openfast.Message;
 
 public class ErrorCode {
-    private static final Map ALERT_CODES = new HashMap();
+    private static final Map<Integer, ErrorCode> ALERT_CODES = new HashMap<Integer, ErrorCode>();
     private final int code;
     private final String shortName;
     private final String description;

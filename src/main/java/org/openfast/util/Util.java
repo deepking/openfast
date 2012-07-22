@@ -84,13 +84,13 @@ public class Util {
         return ByteUtil.combine(base, 0, base.length - subtraction, diff, 0, diff.length);
     }
 
-    public static String collectionToString(Collection set) {
+    public static String collectionToString(Collection<?> set) {
         return collectionToString(set, ",");
     }
 
-    public static String collectionToString(Collection set, String sep) {
+    public static String collectionToString(Collection<?> set, String sep) {
         StringBuffer buffer = new StringBuffer();
-        Iterator iter = set.iterator();
+        Iterator<?> iter = set.iterator();
         buffer.append("{");
         while (iter.hasNext()) {
             buffer.append(iter.next()).append(sep);

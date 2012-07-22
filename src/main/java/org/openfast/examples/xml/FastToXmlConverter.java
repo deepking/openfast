@@ -67,7 +67,7 @@ public class FastToXmlConverter {
         writer.startNode(message.getString(nodeNameIdx));
         if (message.isDefined(attributesIdx)) {
             SequenceValue attributes = message.getSequence(attributesIdx);
-            Iterator iter = attributes.iterator();
+            Iterator<GroupValue> iter = attributes.iterator();
             while (iter.hasNext()) {
                 GroupValue attr = (GroupValue) iter.next();
                 writer.addAttribute(attr.getString(attributeNameIdx), attr.getString(attributeValueIdx));
@@ -78,7 +78,7 @@ public class FastToXmlConverter {
         }
         if (message.isDefined(childrenIdx)) {
             SequenceValue children = message.getSequence(childrenIdx);
-            Iterator iter = children.iterator();
+            Iterator<GroupValue> iter = children.iterator();
             while (iter.hasNext()) {
                 GroupValue child = (GroupValue) iter.next();
                 writeXml(writer, child.getGroup(0));

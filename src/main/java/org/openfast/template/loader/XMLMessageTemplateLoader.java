@@ -76,7 +76,7 @@ public class XMLMessageTemplateLoader implements MessageTemplateLoader {
         initialContext.setErrorHandler(ErrorHandler.DEFAULT);
         initialContext.setTemplateRegistry(new BasicTemplateRegistry());
         initialContext.setTypeMap(Type.getRegisteredTypeMap());
-        initialContext.setFieldParsers(new ArrayList());
+        initialContext.setFieldParsers(new ArrayList<FieldParser>());
         initialContext.addFieldParser(new ScalarParser());
         initialContext.addFieldParser(new GroupParser());
         initialContext.addFieldParser(new SequenceParser());
@@ -202,7 +202,7 @@ public class XMLMessageTemplateLoader implements MessageTemplateLoader {
         return initialContext.getTemplateRegistry();
     }
 
-    public void setTypeMap(Map typeMap) {
+    public void setTypeMap(Map<String, Type> typeMap) {
         initialContext.setTypeMap(typeMap);
     }
 

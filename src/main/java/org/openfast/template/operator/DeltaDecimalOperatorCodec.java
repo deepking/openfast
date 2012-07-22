@@ -70,12 +70,13 @@ final class DeltaDecimalOperatorCodec extends AlwaysPresentOperatorCodec {
         if (priorVal.isUndefined()) {
             if (field.getDefaultValue().isUndefined()) {
                 priorValue = (DecimalValue) field.getBaseValue();
-            } else if (val == null) {
-                if (field.isOptional()) {
-                    return ScalarValue.NULL;
-                } else {
-                    throw new IllegalStateException("Field cannot be null.");
-                }
+// dead code
+//            } else if (val == null) {
+//                if (field.isOptional()) {
+//                    return ScalarValue.NULL;
+//                } else {
+//                    throw new IllegalStateException("Field cannot be null.");
+//                }
             } else {
                 priorValue = (DecimalValue) field.getDefaultValue();
             }

@@ -5,7 +5,7 @@ import java.util.List;
 import org.openfast.template.Field;
 
 public class SerializerRegistry {
-    private List serializers = new ArrayList();
+    private List<FieldSerializer> serializers = new ArrayList<FieldSerializer>();
 
     public void addFieldSerializer(FieldSerializer serializer) {
         serializers.add(serializer);

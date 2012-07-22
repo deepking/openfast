@@ -48,11 +48,12 @@ public class TwinValue extends ScalarValue {
      * @return If the passed object is a TwinValue object, returns true, false
      *         otherwise
      */
+    @Override
     public boolean equals(Object obj) {
         if ((obj == null) || !(obj instanceof TwinValue)) {
             return false;
         }
-        return equals((TwinValue) obj);
+        return equals((TwinValue)obj);
     }
 
     /**
@@ -68,6 +69,7 @@ public class TwinValue extends ScalarValue {
         return (first.equals(other.first) && second.equals(other.second));
     }
 
+    @Override
     public int hashCode() {
         return first.hashCode() * 37 + second.hashCode();
     }
@@ -77,6 +79,7 @@ public class TwinValue extends ScalarValue {
      * 
      * @return string in the form (first ScalarValue, second ScalarValue)
      */
+    @Override
     public String toString() {
         return first.toString() + ", " + second.toString();
     }

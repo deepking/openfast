@@ -22,9 +22,11 @@ package org.openfast.template.loader;
 
 import java.util.List;
 import java.util.Map;
+
 import org.openfast.QName;
 import org.openfast.error.ErrorHandler;
 import org.openfast.template.TemplateRegistry;
+import org.openfast.template.type.Type;
 import org.w3c.dom.Element;
 
 public class ParsingContext {
@@ -40,8 +42,8 @@ public class ParsingContext {
     private String dictionary = null;
     private ErrorHandler errorHandler;
     private TemplateRegistry templateRegistry;
-    private Map typeMap;
-    private List fieldParsers;
+    private Map<String, Type> typeMap;
+    private List<FieldParser> fieldParsers;
     private QName name;
 
     public ParsingContext() {
@@ -118,28 +120,28 @@ public class ParsingContext {
         this.templateRegistry = templateRegistry;
     }
 
-    public void setTypeMap(Map typeMap) {
+    public void setTypeMap(Map<String, Type> typeMap) {
         this.typeMap = typeMap;
     }
 
-    public Map getTypeMap() {
+    public Map<String, Type> getTypeMap() {
         if (typeMap == null)
             return parent.getTypeMap();
         return typeMap;
     }
 
-    public List getFieldParsers() {
+    public List<FieldParser> getFieldParsers() {
         if (fieldParsers == null)
             return parent.getFieldParsers();
         return fieldParsers;
     }
 
-    public void setFieldParsers(List list) {
+    public void setFieldParsers(List<FieldParser> list) {
         this.fieldParsers = list;
     }
 
     public FieldParser getFieldParser(Element element) {
-        List parsers = getFieldParsers();
+        List<FieldParser> parsers = getFieldParsers();
         for (int i = parsers.size() - 1; i >= 0; i--) {
             FieldParser fieldParser = ((FieldParser) parsers.get(i));
             if (fieldParser.canParse(element, this))

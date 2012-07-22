@@ -33,7 +33,7 @@ import org.openfast.template.type.Type;
 public class Operator implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private static final Map OPERATOR_NAME_MAP = new HashMap();
+    private static final Map<String, Operator> OPERATOR_NAME_MAP = new HashMap<String, Operator>();
 
     private final String name;
 

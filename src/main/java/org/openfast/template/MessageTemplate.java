@@ -149,7 +149,7 @@ public class MessageTemplate extends Group implements FieldSet {
      * @return Returns the class of the message
      */
     @Override
-    public Class getValueType() {
+    public Class<? extends FieldValue> getValueType() {
         return Message.class;
     }
 

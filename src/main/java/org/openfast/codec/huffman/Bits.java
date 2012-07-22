@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 
 /**
  * bit list
- * 
- * @author chengyi Jul 17, 2012
- * 
+ * @author chengyi Jul 22, 2012
+ *
  */
 public class Bits implements Iterable<Integer> {
     private ArrayList<Integer> bits = new ArrayList<Integer>();
@@ -59,9 +59,9 @@ public class Bits implements Iterable<Integer> {
 
     @Override
     public String toString() {
-        return Joiner.on(" ").join(bits);
+        return Objects.toStringHelper(this).addValue(Joiner.on(" ").join(bits)).toString();
     }
-
+    
     public static void main(String[] args) {
         Bits bitArray = new Bits();
         bitArray.add(0);
@@ -69,6 +69,7 @@ public class Bits implements Iterable<Integer> {
         bitArray.add(1);
         bitArray.add(0);
         bitArray.add(1);
+        System.out.println(bitArray);
         System.out.println(new String(bitArray.toByteArray()));
     }
 }
